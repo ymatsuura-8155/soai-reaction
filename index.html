@@ -1,0 +1,2685 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>不斉自己触媒反応ラボ - 基礎から広がる未来の応用</title>
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Tone.js for audio cues -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/tone/14.8.49/Tone.min.js"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            chiralR: '#2563eb', // 右手型 (鮮明なロイヤルブルー)
+            chiralS: '#dc2626', // 左手型 (鮮明なクリムゾンレッド)
+          }
+        }
+      }
+    }
+  </script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;600&family=Noto+Sans+JP:wght@400;500;700&display=swap');
+    body {
+      font-family: 'Noto Sans JP', 'Inter', sans-serif;
+    }
+    .lens-handle {
+      filter: drop-shadow(0 15px 25px rgba(0,0,0,0.18));
+      cursor: grab;
+    }
+    .lens-handle:active {
+      cursor: grabbing;
+    }
+    .custom-slider::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 18px;
+      height: 18px;
+      border-radius: 50%;
+      background: #4f46e5;
+      cursor: pointer;
+      box-shadow: 0 1px 4px rgba(79, 70, 229, 0.4);
+      transition: transform 0.15s ease;
+    }
+    .custom-slider::-webkit-slider-thumb:hover {
+      transform: scale(1.15);
+    }
+  </style>
+</head>
+<body class="bg-slate-100 text-slate-800 min-h-screen flex flex-col selection:bg-indigo-100 selection:text-indigo-900">
+
+  <header class="border-b border-slate-200/90 bg-white/90 backdrop-blur sticky top-0 z-50 shadow-xs">
+    <div class="max-w-7xl mx-auto px-4 py-3 flex flex-wrap items-center justify-between gap-4">
+      <div class="flex items-center space-x-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-indigo-600 to-cyan-500 flex items-center justify-center shadow-md shadow-indigo-500/20">
+          <svg class="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+          </svg>
+        </div>
+        <div>
+          <h1 class="text-lg md:text-xl font-bold bg-gradient-to-r from-indigo-700 via-blue-700 to-cyan-700 bg-clip-text text-transparent">
+            不斉自己触媒反応 インタラクティブラボ
+          </h1>
+          <p class="text-xs text-slate-500">生命の鏡像非対称性の起源と、最先端テクノロジーへの展開</p>
+        </div>
+      </div>
+      <div class="flex items-center gap-2">
+        <span class="inline-flex items-center px-3 py-1 rounded-full text-xs font-semibold bg-indigo-50 text-indigo-700 border border-indigo-200">
+          壮亜反応 (Soai Reaction) モデル
+        </span>
+      </div>
+    </div>
+  </header>
+
+  <main class="flex-1 max-w-7xl mx-auto px-4 py-6 w-full flex flex-col">
+    <nav class="flex border-b border-slate-200 space-x-1 sm:space-x-3 mb-6 overflow-x-auto no-scrollbar" aria-label="Tabs">
+      <button onclick="switchTab('overview')" id="tab-btn-overview"
+        class="tab-btn py-3 px-4 border-b-2 font-semibold text-sm rounded-t-lg transition flex items-center gap-2 text-indigo-600 border-indigo-600 bg-white shadow-xs">
+        <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
+        </svg>
+        <span>基本概要と増幅シミュレータ</span>
+      </button>
+
+      <button onclick="switchTab('app1')" id="tab-btn-app1"
+        class="tab-btn py-3 px-4 border-b-2 font-medium text-sm rounded-t-lg transition flex items-center gap-2 text-slate-600 border-transparent hover:text-slate-900 hover:border-slate-300">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+        <span>応用① 超高感度キラルセンサー</span>
+      </button>
+
+      <button onclick="switchTab('app2')" id="tab-btn-app2"
+        class="tab-btn py-3 px-4 border-b-2 font-medium text-sm rounded-t-lg transition flex items-center gap-2 text-slate-600 border-transparent hover:text-slate-900 hover:border-slate-300">
+        <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>
+        <span>応用② 自己増殖・省資源医薬品合成</span>
+      </button>
+
+      <button onclick="switchTab('app3')" id="tab-btn-app3"
+        class="tab-btn py-3 px-4 border-b-2 font-medium text-sm rounded-t-lg transition flex items-center gap-2 text-slate-600 border-transparent hover:text-slate-900 hover:border-slate-300">
+        <span class="w-2.5 h-2.5 rounded-full bg-purple-500"></span>
+        <span>応用③ 鑑識シミュレータ (偽造防止)</span>
+      </button>
+    </nav>
+
+    <section id="tab-overview" class="tab-pane flex flex-col gap-6">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <!-- 概念解説カード -->
+        <div class="lg:col-span-1 bg-white border border-slate-200/90 rounded-2xl p-6 shadow-sm flex flex-col justify-between">
+          <div>
+            <div class="flex items-center gap-2 mb-3">
+              <span class="px-2.5 py-0.5 text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 rounded-full">基礎からわかる核心</span>
+            </div>
+            <h2 class="text-xl font-bold text-slate-900 mb-3">分子の「右手」と「左手」</h2>
+            <p class="text-slate-600 text-sm leading-relaxed mb-4">
+              右手の手袋は左手にははまりません。このように鏡写しで重ね合わせられない幾何学的性質を<strong class="text-indigo-600">「キラル（不斉）」</strong>と呼びます。
+            </p>
+            <div class="p-4 rounded-xl bg-slate-50 border border-slate-200 space-y-2 text-xs text-slate-700 mb-4">
+              <div class="flex items-start gap-2">
+                <span class="font-bold text-chiralR shrink-0">右手型 (R) :</span>
+                <span>自分と同じ右手型を作る触媒になる（自己触媒）</span>
+              </div>
+              <div class="flex items-start gap-2">
+                <span class="font-bold text-chiralS shrink-0">左手型 (S) :</span>
+                <span>自分と同じ左手型を作る触媒になる（自己触媒）</span>
+              </div>
+              <div class="flex items-start gap-2 pt-2 border-t border-slate-200 text-amber-700 font-medium">
+                <span class="font-bold shrink-0">秘密のルール :</span>
+                <span>右手と左手が衝突して出会うと、触媒活性を互いに喪失（相互不活性化）！</span>
+              </div>
+            </div>
+            <p class="text-slate-500 text-xs leading-relaxed">
+              これにより初期のわずか<strong class="text-amber-600 font-semibold">0.1%の偶然の偏り</strong>が雪だるま式に自律増幅し、最終的にはほぼ100%片方だけに統一されます。これが日本の硎井健三教授らによって実証された<strong class="text-slate-900">壮亜反応（Soai反応）</strong>です。
+            </p>
+          </div>
+          <div class="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+            <span>生命の謎：なぜ生体アミノ酸はL型のみ？</span>
+            <span class="text-indigo-600 font-semibold">自律的対称性の破れ</span>
+          </div>
+        </div>
+
+        <div class="lg:col-span-2 bg-white border border-slate-200/90 rounded-2xl p-6 shadow-sm flex flex-col">
+          <div class="flex flex-wrap items-center justify-between gap-3 mb-4">
+            <div>
+              <h3 class="text-lg font-bold text-slate-900 flex items-center gap-2">
+                <span>リアルタイム不斉増幅シミュレータ</span>
+                <span class="text-xs bg-slate-100 text-slate-700 px-2 py-0.5 rounded-full border border-slate-300">分子運動計算</span>
+              </h3>
+              <p class="text-xs text-slate-500">初期の微細な比率差を設定し、反応進行に伴う劇的な偏りの誕生を観察できます</p>
+            </div>
+            <div class="flex items-center gap-2">
+              <button id="sim-start-btn" onclick="toggleSimulation()"
+                class="px-4 py-2 bg-indigo-600 hover:bg-indigo-700 active:scale-95 text-white font-medium text-xs rounded-xl shadow-sm transition flex items-center gap-2">
+                <svg id="sim-play-icon" class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+                <span id="sim-start-label">反応開始</span>
+              </button>
+              <button onclick="resetSimulation()"
+                class="px-3 py-2 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 font-medium text-xs rounded-xl border border-slate-300 transition">
+                リセット
+              </button>
+            </div>
+          </div>
+
+          <!-- キャンバス領域 (ライトモード背景) -->
+          <div class="relative w-full h-64 sm:h-72 bg-slate-50 rounded-xl overflow-hidden border border-slate-200 mb-4 flex items-center justify-center">
+            <canvas id="reaction-canvas" class="w-full h-full block"></canvas>
+            
+            <!-- リアルタイム比率オーバーレイ -->
+            <div class="absolute top-3 left-3 bg-white/90 backdrop-blur border border-slate-200 rounded-lg p-2.5 shadow-sm flex flex-col gap-1 text-xs">
+              <div class="flex items-center justify-between gap-4">
+                <span class="flex items-center gap-1.5 text-chiralR font-semibold">
+                  <span class="w-2.5 h-2.5 rounded-full bg-chiralR shadow-xs"></span> 右手型 (R)
+                </span>
+                <span id="count-r" class="font-mono text-slate-700 font-medium">51 (51.0%)</span>
+              </div>
+              <div class="flex items-center justify-between gap-4">
+                <span class="flex items-center gap-1.5 text-chiralS font-semibold">
+                  <span class="w-2.5 h-2.5 rounded-full bg-chiralS shadow-xs"></span> 左手型 (S)
+                </span>
+                <span id="count-s" class="font-mono text-slate-700 font-medium">49 (49.0%)</span>
+              </div>
+              <div class="pt-1 mt-1 border-t border-slate-200 flex items-center justify-between text-[11px] text-slate-500">
+                <span>キラル過剰率 (% ee):</span>
+                <span id="val-ee" class="font-mono font-bold text-amber-600">+2.0%</span>
+              </div>
+            </div>
+
+            <!-- 反応進捗バー -->
+            <div class="absolute bottom-3 right-3 bg-white/90 backdrop-blur border border-slate-200 rounded-lg px-3 py-1.5 text-[11px] text-slate-600 shadow-xs flex items-center gap-2">
+              <span>反応世代:</span>
+              <span id="generation-counter" class="font-mono font-bold text-indigo-700">0 サイクル</span>
+            </div>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-2 gap-4 pt-2">
+            <div>
+              <div class="flex justify-between items-center mb-1 text-xs">
+                <span class="text-slate-700 font-medium">初期の比率設定（右手型 : 左手型）</span>
+                <span id="slider-ratio-label" class="font-mono text-indigo-700 font-bold">51% : 49% (微小差)</span>
+              </div>
+              <input id="initial-ratio-slider" type="range" min="50" max="60" step="0.5" value="51"
+                class="w-full custom-slider bg-slate-200 rounded-lg appearance-none h-2 cursor-pointer"
+                oninput="updateInitialRatio(this.value)">
+              <div class="flex justify-between text-[10px] text-slate-400 mt-1">
+                <span>50% (完全均等)</span>
+                <span>50.5% (極微小差)</span>
+                <span>55% (中程度差)</span>
+                <span>60% (大差)</span>
+              </div>
+            </div>
+            <div>
+              <div class="flex justify-between items-center mb-1 text-xs">
+                <span class="text-slate-700 font-medium">相互不活性化（ヘテロ二量体の形成）強度</span>
+                <span id="slider-dimer-label" class="font-mono text-emerald-700 font-bold">高（増幅が加速）</span>
+              </div>
+              <input id="dimer-strength-slider" type="range" min="1" max="5" step="1" value="4"
+                class="w-full custom-slider bg-slate-200 rounded-lg appearance-none h-2 cursor-pointer"
+                oninput="updateDimerStrength(this.value)">
+              <div class="flex justify-between text-[10px] text-slate-400 mt-1">
+                <span>無効 (線形)</span>
+                <span>標準</span>
+                <span>強力 (指数的増幅)</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-app1" class="tab-pane hidden flex-col gap-6">
+      <div class="bg-gradient-to-r from-emerald-50 via-teal-50 to-white border border-emerald-200 rounded-2xl p-6 shadow-sm">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="px-2.5 py-0.5 text-xs font-bold rounded-full bg-emerald-100 text-emerald-800 border border-emerald-300">応用分野 01</span>
+          <span class="text-xs text-slate-500">分析化学・品質保証・宇宙生物学</span>
+        </div>
+        <h2 class="text-2xl font-bold text-slate-900 mb-2">ナノグラムの偏りを暴く「分子の超巨大アンプ」</h2>
+        <p class="text-slate-600 text-sm max-w-4xl leading-relaxed">
+          従来の分析機器（旋光計やHPLC）では、0.001%の右手・左手の偏りを直接測ることは極めて困難です。
+          不斉自己触媒反応系に微量サンプルを「種（シード）」として添加すると、反応自身がその極微の偏りを数万〜数百万倍に自律増幅し、目に見える100%の差として出力します。
+        </p>
+      </div>
+
+      <!-- キラルセンサー実験コントロール -->
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6">
+        <div class="lg:col-span-5 bg-white border border-slate-200/90 rounded-2xl p-6 flex flex-col justify-between shadow-sm">
+          <div>
+            <h3 class="text-base font-bold text-slate-900 mb-2 flex items-center gap-2">
+              <span>検体サンプルを選択・滴下</span>
+            </h3>
+            <p class="text-xs text-slate-500 mb-4">
+              ごく微小なキラル刺激（同位体差、鉱物結晶、光）を選択して反応セルに滴下し、センサーの増幅能力を体験できます。
+            </p>
+
+            <div class="space-y-3">
+              <button onclick="selectSensorSample('heavy-water')" id="sample-btn-heavy-water"
+                class="sensor-sample-btn w-full p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-left transition flex items-start gap-3">
+                <span class="p-2 rounded-lg bg-emerald-100 text-emerald-700 text-sm font-mono shrink-0 font-bold">H/D</span>
+                <div>
+                  <div class="text-xs font-bold text-slate-800">重水素（D）同位体置換キラル分子</div>
+                  <div class="text-[11px] text-slate-500">水素原子1個が重水素に置き換わっただけの極限のキラル構造（偏り &lt; 0.01%）</div>
+                </div>
+              </button>
+
+              <button onclick="selectSensorSample('quartz')" id="sample-btn-quartz"
+                class="sensor-sample-btn w-full p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-left transition flex items-start gap-3">
+                <span class="p-2 rounded-lg bg-cyan-100 text-cyan-700 text-sm shrink-0">💎</span>
+                <div>
+                  <div class="text-xs font-bold text-slate-800">d-石英（右巻き水晶）パウダー粉末</div>
+                  <div class="text-[11px] text-slate-500">炭素を持たない無機鉱物の表面らせん結晶性状（不斉炭素なし）</div>
+                </div>
+              </button>
+
+              <button onclick="selectSensorSample('cpl-light')" id="sample-btn-cpl-light"
+                class="sensor-sample-btn w-full p-3 rounded-xl border border-slate-200 bg-slate-50 hover:bg-slate-100 text-left transition flex items-start gap-3">
+                <span class="p-2 rounded-lg bg-purple-100 text-purple-700 text-sm shrink-0">⚡</span>
+                <div>
+                  <div class="text-xs font-bold text-slate-800">右円偏光（CPL）極微小照射</div>
+                  <div class="text-[11px] text-slate-500">光子の回転角運動量によるわずかなエネルギー差（宇宙空間の星間偏光の再現）</div>
+                </div>
+              </button>
+            </div>
+          </div>
+
+          <div class="mt-6 pt-4 border-t border-slate-100 flex flex-col gap-2">
+            <button id="sensor-inject-btn" onclick="runSensorTest()" disabled
+              class="w-full py-3 bg-emerald-600 disabled:bg-slate-100 disabled:text-slate-400 disabled:cursor-not-allowed hover:bg-emerald-700 active:scale-98 text-white font-bold text-sm rounded-xl shadow-sm transition flex items-center justify-center gap-2">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+              </svg>
+              <span>反応セルへ滴下・増幅分析開始</span>
+            </button>
+            <button onclick="resetSensorTest()" class="w-full py-1.5 text-xs text-slate-500 hover:text-slate-700 transition font-medium">
+              セルを初期化・洗浄
+            </button>
+          </div>
+        </div>
+
+        <div class="lg:col-span-7 bg-white border border-slate-200/90 rounded-2xl p-6 flex flex-col justify-between shadow-sm">
+          <div>
+            <div class="flex items-center justify-between mb-3">
+              <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+                <span>ミクロ反応セル内部ダイナミクス</span>
+                <span class="text-[11px] font-mono px-2 py-0.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-200">2D Collision &amp; Catalysis</span>
+              </h3>
+              <span id="sensor-status-badge" class="px-2.5 py-1 text-xs rounded-full bg-slate-100 text-slate-600 font-mono border border-slate-200">
+                待機中 (IDLE)
+              </span>
+            </div>
+
+            <!-- 分子反応シミュレーションキャンバス -->
+            <div class="relative w-full h-56 bg-slate-900 rounded-xl overflow-hidden border border-slate-300 mb-4 shadow-inner">
+              <canvas id="sensor-reactor-canvas" class="w-full h-full block"></canvas>
+              
+              <!-- 滴下インジェクター表示 -->
+              <div id="sensor-dropper" class="absolute -top-12 left-1/2 -translate-x-1/2 transition-all duration-500 pointer-events-none flex flex-col items-center z-10 opacity-0">
+                <div class="w-3.5 h-10 bg-gradient-to-b from-slate-300 to-cyan-300 rounded-t-sm shadow-md"></div>
+                <div class="w-1.5 h-3 bg-cyan-400"></div>
+                <div id="sensor-droplet" class="w-3 h-3 rounded-full bg-cyan-400 animate-ping shadow-lg shadow-cyan-400/80"></div>
+              </div>
+
+              <!-- 反応フェーズオーバーレイ -->
+              <div class="absolute bottom-2.5 left-2.5 right-2.5 bg-slate-900/85 backdrop-blur border border-slate-700/80 rounded-lg px-3 py-1.5 flex items-center justify-between text-[11px] text-slate-300">
+                <div class="flex items-center gap-3">
+                  <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-blue-500"></span> R型</span>
+                  <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-rose-500"></span> S型</span>
+                  <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-slate-400"></span> 原料(アキラル)</span>
+                  <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-amber-500"></span> ヘテロ不活性体</span>
+                </div>
+                <span id="sensor-step-text" class="font-mono text-cyan-300 font-semibold">待機: サンプルを選択してください</span>
+              </div>
+            </div>
+
+            <!-- ステージ別ゲージ -->
+            <div class="space-y-3 mb-4">
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span class="text-slate-600 font-medium">① 投入された入力サンプルの微小差 (Input)</span>
+                  <span id="sensor-input-label" class="font-mono text-slate-500">未検出</span>
+                </div>
+                <div class="w-full bg-slate-100 h-3 rounded-full overflow-hidden p-0.5 border border-slate-200 flex">
+                  <div id="sensor-bar-input-r" class="bg-chiralR h-full rounded-l-full transition-all duration-500" style="width: 50%"></div>
+                  <div id="sensor-bar-input-s" class="bg-chiralS h-full rounded-r-full transition-all duration-500" style="width: 50%"></div>
+                </div>
+              </div>
+
+              <div>
+                <div class="flex justify-between text-xs mb-1">
+                  <span class="text-slate-600 font-medium">② 自己触媒オートアンプ増幅 (Amplification Stage)</span>
+                  <span id="sensor-gain-label" class="font-mono text-emerald-700 font-bold">ゲイン: 1x</span>
+                </div>
+                <div class="w-full bg-slate-100 h-6 rounded-full overflow-hidden p-0.5 border border-slate-200 flex relative shadow-inner">
+                  <div id="sensor-bar-amp-r" class="bg-gradient-to-r from-blue-600 to-cyan-500 h-full rounded-l-full transition-all duration-300" style="width: 50%"></div>
+                  <div id="sensor-bar-amp-s" class="bg-gradient-to-r from-amber-500 to-rose-600 h-full rounded-r-full transition-all duration-300" style="width: 50%"></div>
+                  <div class="absolute inset-0 flex items-center justify-center text-xs font-mono font-bold text-white tracking-wide drop-shadow-[0_1px_2px_rgba(0,0,0,0.6)] pointer-events-none" id="sensor-amp-text">
+                    50% : 50%
+                  </div>
+                </div>
+              </div>
+
+              <!-- 4つの反応フェーズ進行バー -->
+              <div class="grid grid-cols-4 gap-1.5 pt-1 text-[10px] text-center font-mono">
+                <div id="phase-step-1" class="p-1.5 rounded bg-slate-100 text-slate-400 border border-slate-200 transition">① シード滴下</div>
+                <div id="phase-step-2" class="p-1.5 rounded bg-slate-100 text-slate-400 border border-slate-200 transition">② 自己増殖開始</div>
+                <div id="phase-step-3" class="p-1.5 rounded bg-slate-100 text-slate-400 border border-slate-200 transition">③ 対掌体不活性化</div>
+                <div id="phase-step-4" class="p-1.5 rounded bg-slate-100 text-slate-400 border border-slate-200 transition">④ 単一掌性収束</div>
+              </div>
+
+              <div>
+                <div class="p-3.5 rounded-xl bg-slate-50 border border-slate-200 flex items-center justify-between">
+                  <div class="flex items-center gap-3">
+                    <div id="sensor-indicator-light" class="w-4 h-4 rounded-full bg-slate-300 transition-colors duration-300"></div>
+                    <div>
+                      <div id="sensor-result-title" class="text-xs sm:text-sm font-bold text-slate-700">サンプル未投入</div>
+                      <div id="sensor-result-desc" class="text-[11px] text-slate-500">検体を選択して滴下ボタンを押すと反応が始まります</div>
+                    </div>
+                  </div>
+                  <div class="text-right font-mono">
+                    <div class="text-[10px] text-slate-500">検出限界突破率</div>
+                    <div id="sensor-factor" class="text-sm sm:text-base font-bold text-emerald-700">0 倍</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="bg-emerald-50 border border-emerald-200 rounded-xl p-3 text-xs text-emerald-800 flex items-start gap-2">
+            <svg class="w-4 h-4 shrink-0 mt-0.5 text-emerald-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>実例：実際の研究でも、重水素化による極微差や鉱物結晶表面のキラリティが壮亜反応によって99.5%以上の高純度光学活性体として明確に検出されています。</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-app2" class="tab-pane hidden flex-col gap-6">
+      <div class="bg-gradient-to-r from-blue-50 via-indigo-50 to-white border border-blue-200 rounded-2xl p-6 shadow-sm">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="px-2.5 py-0.5 text-xs font-bold rounded-full bg-blue-100 text-blue-800 border border-blue-300">応用分野 02</span>
+          <span class="text-xs text-slate-500">創薬・グリーンケミストリー・省資源製造</span>
+        </div>
+        <h2 class="text-2xl font-bold text-slate-900 mb-2">貴金属触媒不要！製品そのものが触媒になるクリーン合成</h2>
+        <p class="text-slate-600 text-sm max-w-4xl leading-relaxed">
+          医薬品は右手型と左手型で全く薬効が異なり、片方が劇薬・毒性を持つケースも少なくありません。
+          従来の「外部触媒投入型」と、不斉自己触媒による「自給自足型」を比較し、コストと廃棄物削減効果を体験してみましょう。
+        </p>
+      </div>
+
+      <!-- リアクター可視化シミュレーター -->
+      <div class="bg-white border border-slate-200/90 rounded-2xl p-6 shadow-sm">
+        <div class="flex flex-wrap items-center justify-between gap-4 mb-4">
+          <div>
+            <h3 class="text-base font-bold text-slate-900 flex items-center gap-2">
+              <span>連続供給フローリアクター（分子変換リアルタイム可視化）</span>
+              <span id="pharma-reactor-badge" class="text-xs bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full border border-emerald-200 font-mono">自己増殖稼働中</span>
+            </h3>
+            <p class="text-xs text-slate-500">原料（キラルでないアキラル原料）を注ぎ足すだけで、既存の薬効分子が自発触媒となって倍々ゲームで増殖します</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <!-- 方式切り替え -->
+            <div class="flex bg-slate-100 p-1 rounded-xl border border-slate-200 text-xs">
+              <button id="btn-mode-autocat" onclick="setPharmaMode('autocat')" class="px-3 py-1.5 rounded-lg font-bold bg-indigo-600 text-white shadow-xs transition">
+                不斉自己触媒 (次世代)
+              </button>
+              <button id="btn-mode-trad" onclick="setPharmaMode('traditional')" class="px-3 py-1.5 rounded-lg font-medium text-slate-600 hover:text-slate-900 transition">
+                従来法 (貴金属添加)
+              </button>
+            </div>
+            <button onclick="feedRawMaterials()"
+              class="px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs rounded-xl shadow-sm active:scale-95 transition flex items-center gap-2">
+              <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+              </svg>
+              <span>安価な原料を追加投入 (+150 g)</span>
+            </button>
+            <button onclick="resetPharmaReactor()" class="px-3 py-2 bg-slate-100 hover:bg-slate-200 active:scale-95 text-slate-700 font-medium text-xs rounded-xl border border-slate-300 transition">
+              初期化
+            </button>
+          </div>
+        </div>
+
+        <!-- リアクターキャンバス -->
+        <div class="relative w-full h-64 sm:h-72 bg-slate-900 rounded-xl overflow-hidden border border-slate-300 mb-4 shadow-inner">
+          <canvas id="pharma-reactor-canvas" class="w-full h-full block"></canvas>
+          
+          <!-- 原料供給ノズル表示アニメーション -->
+          <div id="pharma-feeder-nozzle" class="absolute top-2 left-1/2 -translate-x-1/2 bg-slate-800/90 border border-slate-600 rounded-full px-3 py-1 flex items-center gap-2 text-[10px] text-slate-300 pointer-events-none transition-all duration-300 opacity-80">
+            <span class="w-2 h-2 rounded-full bg-cyan-400 animate-ping"></span>
+            <span id="pharma-feeder-label">原料自動フィード口 (準備完了)</span>
+          </div>
+
+          <!-- キャンバス内オーバーレイ情報 -->
+          <div class="absolute bottom-2.5 left-2.5 right-2.5 bg-slate-900/85 backdrop-blur border border-slate-700/80 rounded-lg px-3 py-1.5 flex flex-wrap items-center justify-between text-[11px] text-slate-300 gap-2">
+            <div class="flex items-center gap-3">
+              <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span> 薬効分子(R型製品/自己触媒)</span>
+              <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-slate-400"></span> 未反応アキラル原料</span>
+              <span id="pharma-legend-metal" class="flex items-center gap-1.5 hidden"><span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span> 貴金属触媒残渣(有害)</span>
+            </div>
+            <div class="font-mono text-cyan-300 font-medium flex items-center gap-3">
+              <span>分子変換率: <strong id="pharma-conversion-rate" class="text-emerald-400 font-bold">100%</strong></span>
+              <span>触媒回転数(TON): <strong id="pharma-ton-val" class="text-cyan-400 font-bold">100,000+</strong></span>
+            </div>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 text-center">
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <div class="text-xs text-slate-500 mb-1">投入した外部触媒量</div>
+            <div id="pharma-catalyst-used" class="text-2xl font-bold font-mono text-indigo-700">1.0 <span class="text-xs font-normal text-slate-500">mg (固定)</span></div>
+            <div id="pharma-catalyst-sub" class="text-[10px] text-slate-400 mt-1">最初の一回きり (以後は自己増殖)</div>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <div class="text-xs text-slate-500 mb-1">自律合成された薬効分子量</div>
+            <div id="pharma-yield-val" class="text-2xl font-bold font-mono text-emerald-700">100 <span class="text-xs font-normal text-slate-500">g</span></div>
+            <div id="pharma-yield-sub" class="text-[10px] text-emerald-600 font-medium mt-1">触媒能を維持したまま増殖中</div>
+          </div>
+          <div class="p-4 rounded-xl bg-slate-50 border border-slate-200">
+            <div class="text-xs text-slate-500 mb-1">光学純度 (目的の右手型)</div>
+            <div id="pharma-purity-val" class="text-2xl font-bold font-mono text-cyan-700">> 99.8%</div>
+            <div id="pharma-purity-sub" class="text-[10px] text-slate-400 mt-1">有害な対掌体の混入ゼロ</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 従来型 vs 不斉自己触媒 比較 -->
+      <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <!-- 従来手法カード -->
+        <div id="card-trad-method" class="bg-white border border-slate-200/90 rounded-2xl p-6 flex flex-col justify-between shadow-sm transition">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="px-2.5 py-1 text-xs font-bold rounded-lg bg-red-50 text-red-700 border border-red-200">従来の不斉合成手法</span>
+              <span class="text-xs text-slate-500">ルテニウム・ロジウム等の貴金属錯体</span>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900 mb-2">外部触媒の連続添加と過酷な分離</h3>
+            <p class="text-xs text-slate-600 mb-6 leading-relaxed">
+              反応ごとに毎回、高価な貴金属触媒を外部から追加。反応後は薬品から有害な重金属を除去する厳しい精製工程が必須となります。
+            </p>
+
+            <div class="space-y-3 p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs">
+              <div class="flex justify-between items-center py-1 border-b border-slate-200">
+                <span class="text-slate-600">触媒原料コスト</span>
+                <span id="trad-cost-val" class="font-mono text-red-600 font-bold">極めて高価 (Ru/Rh等)</span>
+              </div>
+              <div class="flex justify-between items-center py-1 border-b border-slate-200">
+                <span class="text-slate-600">有害重金属の残留リスク</span>
+                <span class="font-mono text-amber-700 font-bold">あり (厳しい除去工程要)</span>
+              </div>
+              <div class="flex justify-between items-center py-1">
+                <span class="text-slate-600">廃棄物量 (E-ファクター)</span>
+                <span class="font-mono text-red-600 font-bold">大（副生成物・溶媒多量）</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-6 pt-4 border-t border-slate-100">
+            <div class="text-[11px] text-slate-500 mb-2">バッチあたりの累積コスト試算</div>
+            <div class="h-3 bg-slate-200 rounded-full overflow-hidden flex">
+              <div id="trad-cost-bar" class="bg-rose-500 h-full w-[85%] transition-all duration-300"></div>
+            </div>
+            <div class="flex justify-between text-[10px] text-slate-500 mt-1">
+              <span>ベース材料費</span>
+              <span class="text-rose-600 font-bold">高コスト (+85% 触媒&amp;精製費)</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 不斉自己触媒方式カード -->
+        <div id="card-autocat-method" class="bg-white border-2 border-indigo-400 rounded-2xl p-6 flex flex-col justify-between shadow-sm transition">
+          <div>
+            <div class="flex items-center justify-between mb-4">
+              <span class="px-2.5 py-1 text-xs font-bold rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200">不斉自己触媒 (次世代グリーン手法)</span>
+              <span class="text-xs text-indigo-700 font-mono font-medium">Autocatalytic Process</span>
+            </div>
+            <h3 class="text-lg font-bold text-slate-900 mb-2">生成物そのものが触媒に変化</h3>
+            <p class="text-xs text-slate-600 mb-6 leading-relaxed">
+              最初にほんの少量の「種（シード分子）」を入れるだけ。できた製品が次の原料を自発的に正しい型へ誘導するため、外部触媒の追加が不要です。
+            </p>
+
+            <div class="space-y-3 p-4 rounded-xl bg-slate-50 border border-slate-200 text-xs">
+              <div class="flex justify-between items-center py-1 border-b border-slate-200">
+                <span class="text-slate-600">外部触媒消費</span>
+                <span class="font-mono text-emerald-700 font-bold">最初の0.001%のみ (ほぼゼロ)</span>
+              </div>
+              <div class="flex justify-between items-center py-1 border-b border-slate-200">
+                <span class="text-slate-600">重金属フリー純度</span>
+                <span class="font-mono text-emerald-700 font-bold">100% 混入なし (医薬に理想的)</span>
+              </div>
+              <div class="flex justify-between items-center py-1">
+                <span class="text-slate-600">工程エネルギー・廃棄物</span>
+                <span class="font-mono text-emerald-700 font-bold">大幅削減 (ワンポット連続化)</span>
+              </div>
+            </div>
+          </div>
+
+          <div class="mt-6 pt-4 border-t border-slate-100">
+            <div class="text-[11px] text-slate-500 mb-2">バッチあたりの累積コスト試算</div>
+            <div class="h-3 bg-slate-200 rounded-full overflow-hidden flex">
+              <div class="bg-emerald-600 h-full w-[25%]"></div>
+            </div>
+            <div class="flex justify-between text-[10px] text-slate-500 mt-1">
+              <span>ベース材料費のみ</span>
+              <span class="text-emerald-700 font-bold">コスト 70% 削減</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="tab-app3" class="tab-pane hidden flex-col gap-6">
+      <div class="bg-gradient-to-r from-purple-50 via-cyan-50 to-white border border-cyan-200 rounded-2xl p-6 shadow-sm">
+        <div class="flex items-center gap-2 mb-2">
+          <span class="px-2.5 py-0.5 text-xs font-bold rounded-full bg-cyan-100 text-cyan-800 border border-cyan-300">応用分野 03</span>
+          <span class="text-xs text-slate-500">物理セキュリティ・鑑識・円偏光発光 (CPL)</span>
+        </div>
+        <h2 class="text-2xl font-bold text-slate-900 mb-2">紙幣・パスポートの究極偽造防止：円偏光鑑識システム</h2>
+        <p class="text-slate-600 text-sm max-w-4xl leading-relaxed">
+          不斉自己触媒ポリマーで印字されたセキュリティ層は、肉眼では一般インクや微細透かしに見えますが、適合する円偏光検光器（ルーペ）を通すと単一掌性の光線のみが鮮やかに浮かび上がります。
+        </p>
+
+        <!-- サブナビゲーション -->
+        <div class="flex items-center gap-2 mt-4">
+          <button id="forensic-subnav-inspect" onclick="switchForensicSubTab('inspect')" class="px-4 py-2 text-xs font-bold rounded-xl transition bg-cyan-600 text-white shadow-sm flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" /></svg>
+            <span>検光ルーペ走査 (鑑識ステージ)</span>
+          </button>
+          <button id="forensic-subnav-wave" onclick="switchForensicSubTab('wave')" class="px-4 py-2 text-xs font-medium rounded-xl transition text-slate-600 hover:text-slate-900 bg-white border border-slate-200 flex items-center gap-1.5">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>
+            <span>3D螺旋光波伝播 (分離原理)</span>
+          </button>
+        </div>
+      </div>
+
+      <div id="forensic-view-inspect" class="flex flex-col gap-6">
+        <!-- 上部コントロールバー -->
+        <div class="bg-white border border-slate-200 rounded-2xl p-4 shadow-sm flex flex-wrap items-center justify-between gap-4">
+          <div class="flex flex-wrap items-center gap-3">
+            <div class="flex items-center space-x-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
+              <span class="text-xs text-slate-500 px-2 font-medium">対象物品:</span>
+              <button id="doc-btn-passport" onclick="selectDocument('passport')" class="px-3 py-1 text-xs rounded-lg font-bold transition bg-cyan-600 text-white shadow-sm">
+                日本国旅券 (パスポート)
+              </button>
+              <button id="doc-btn-banknote" onclick="selectDocument('banknote')" class="px-3 py-1 text-xs rounded-lg font-medium transition text-slate-600 hover:text-slate-900">
+                セキュリティ紙幣
+              </button>
+            </div>
+
+            <div class="flex items-center space-x-1.5 bg-slate-100 p-1 rounded-xl border border-slate-200">
+              <span class="text-xs text-slate-500 px-2 font-medium">供試検体:</span>
+              <button id="sample-btn-genuine" onclick="selectSample('genuine')" class="px-3 py-1 text-xs rounded-lg font-semibold transition bg-emerald-100 text-emerald-800 border border-emerald-300">
+                真正品 (不斉自己触媒ポリマー印字)
+              </button>
+              <button id="sample-btn-counterfeit" onclick="selectSample('counterfeit')" class="px-3 py-1 text-xs rounded-lg font-medium transition text-slate-500 hover:text-slate-800">
+                偽造品 (ラセミ体通常インク印字)
+              </button>
+            </div>
+          </div>
+
+          <div class="flex items-center gap-2">
+            <span class="text-xs text-slate-500 font-mono hidden sm:inline">検光フィルター:</span>
+            <div class="flex bg-slate-100 p-1 rounded-xl border border-slate-200">
+              <button id="filter-btn-naked" onclick="setFilterMode('naked')" class="px-2.5 py-1 text-xs rounded-lg font-medium transition text-slate-600 hover:text-slate-900">
+                肉眼 (自然光)
+              </button>
+              <button id="filter-btn-rcpl" onclick="setFilterMode('rcpl')" class="px-2.5 py-1 text-xs rounded-lg font-bold transition bg-emerald-600 text-white shadow-sm">
+                右円偏光 (R-CPL)
+              </button>
+              <button id="filter-btn-lcpl" onclick="setFilterMode('lcpl')" class="px-2.5 py-1 text-xs rounded-lg font-medium transition text-slate-600 hover:text-slate-900">
+                左円偏光 (L-CPL)
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- 2カラム検査ステージ -->
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+          <div class="lg:col-span-8 flex flex-col gap-3">
+            <div class="flex items-center justify-between text-xs text-slate-500 px-1 font-mono">
+              <span class="flex items-center gap-1.5">
+                <svg class="w-4 h-4 text-cyan-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 15l-2 5L9 9l11 4-5 2zm0 0l5 5M7.188 2.239l.777 2.897M5.136 7.965l-2.898-.777M13.95 4.05l-2.122 2.122m-5.657 5.656l-2.12 2.122"/></svg>
+                操作: 円偏光検光ルーペをドラッグして券面を走査してください
+              </span>
+              <span id="scope-status" class="text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200">
+                FILTER: 右円偏光 (R-CPL)
+              </span>
+            </div>
+
+            <!-- ステージ本体 -->
+            <div id="stage-container" class="relative w-full aspect-[16/10] sm:aspect-[16/9.5] bg-slate-100 rounded-2xl border-2 border-slate-300 overflow-hidden shadow-md select-none">
+              <canvas id="docCanvas" class="absolute inset-0 w-full h-full block cursor-crosshair"></canvas>
+
+              <!-- ドラッグ可能ルーペ -->
+              <div id="lens" class="lens-handle absolute rounded-full border-4 border-cyan-500 shadow-[0_0_25px_rgba(2,132,199,0.35)] pointer-events-auto" style="width: 220px; height: 220px; top: 30%; left: 45%;">
+                <canvas id="lensCanvas" class="w-full h-full rounded-full block pointer-events-none"></canvas>
+                <div class="absolute inset-0 rounded-full border border-cyan-400/50 pointer-events-none flex items-center justify-center">
+                  <div class="w-full h-[1px] bg-cyan-500/30 absolute"></div>
+                  <div class="h-full w-[1px] bg-cyan-500/30 absolute"></div>
+                  <div class="w-12 h-12 rounded-full border border-dashed border-cyan-500/60"></div>
+                </div>
+                <div id="lens-badge" class="absolute -bottom-8 left-1/2 -translate-x-1/2 bg-white/95 text-cyan-800 border border-cyan-300 text-[10px] font-mono font-semibold px-2 py-0.5 rounded-full whitespace-nowrap shadow-md flex items-center gap-1">
+                  <span class="w-1.5 h-1.5 rounded-full bg-cyan-500 animate-ping"></span>
+                  <span id="lens-badge-text">R-CPL 偏光受光器</span>
+                </div>
+              </div>
+
+              <!-- 全画面フィルター切り替え -->
+              <div class="absolute top-3 right-3 flex items-center gap-2 z-20">
+                <button id="toggle-full-lens-btn" onclick="toggleFullLensMode()" class="px-2.5 py-1.5 rounded-lg bg-white/90 hover:bg-white text-xs text-slate-700 border border-slate-300 backdrop-blur shadow-sm flex items-center gap-1.5">
+                  <svg class="w-3.5 h-3.5 text-cyan-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 0l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4"/></svg>
+                  <span id="full-lens-text">全画面フィルター化</span>
+                </button>
+                <button onclick="resetLensPosition()" class="p-1.5 rounded-lg bg-white/90 hover:bg-white text-slate-600 hover:text-slate-900 border border-slate-300 backdrop-blur shadow-sm" title="ルーペ位置をリセット">
+                  <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"/></svg>
+                </button>
+              </div>
+            </div>
+
+            <div class="flex items-center justify-between bg-white border border-slate-200 rounded-xl px-4 py-2.5 text-xs text-slate-600 shadow-sm">
+              <div class="flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-cyan-600"></span>
+                <span>印字領域: 右上の国章・菊紋、および中央のマイクロ文字セキュリティ帯</span>
+              </div>
+              <div class="font-mono text-slate-500 hidden sm:block">λ = 525nm (CPL Peak)</div>
+            </div>
+          </div>
+
+          <div class="lg:col-span-4 flex flex-col gap-4">
+            <!-- 判定カード -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+              <div class="flex items-center justify-between mb-3">
+                <h4 class="text-xs font-mono uppercase tracking-wider text-slate-500">鑑識判定ステータス</h4>
+                <span id="telemetry-badge" class="px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  GENUINE AUTHENTIC
+                </span>
+              </div>
+
+              <div class="flex items-baseline gap-2 mb-2">
+                <div id="verdict-title" class="text-2xl font-black text-emerald-600 tracking-tight">真正品 (合格)</div>
+                <span id="verdict-code" class="text-xs font-mono text-slate-500 font-semibold">AUTH-PASS</span>
+              </div>
+              <p id="verdict-desc" class="text-xs text-slate-600 leading-relaxed mb-4">
+                右円偏光検光子で鮮明なエメラルドグリーンの単一キラリティ発光を検出。不斉自己触媒による完全増幅を確認。
+              </p>
+
+              <div class="space-y-3 pt-2 border-t border-slate-100 text-xs">
+                <div>
+                  <div class="flex justify-between mb-1">
+                    <span class="text-slate-600">光学純度 (鏡像異性体過剰率 ee):</span>
+                    <span id="stat-ee" class="font-mono text-emerald-700 font-bold">99.8% ee (R体)</span>
+                  </div>
+                  <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden border border-slate-200">
+                    <div id="bar-ee" class="h-full bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-full transition-all duration-300" style="width: 99.8%"></div>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="flex justify-between mb-1">
+                    <span class="text-slate-600">円偏光発光非対称度 (|g_lum|):</span>
+                    <span id="stat-glum" class="font-mono text-cyan-700 font-bold">+0.84</span>
+                  </div>
+                  <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden border border-slate-200">
+                    <div id="bar-glum" class="h-full bg-cyan-600 rounded-full transition-all duration-300" style="width: 84%"></div>
+                  </div>
+                </div>
+
+                <div>
+                  <div class="flex justify-between mb-1">
+                    <span class="text-slate-600">左右回転光 コントラスト比 (CR):</span>
+                    <span id="stat-cr" class="font-mono text-amber-700 font-bold">142 : 1</span>
+                  </div>
+                  <div class="w-full bg-slate-100 h-2 rounded-full overflow-hidden border border-slate-200">
+                    <div id="bar-cr" class="h-full bg-amber-500 rounded-full transition-all duration-300" style="width: 95%"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- 受光スペクトル -->
+            <div class="bg-white border border-slate-200 rounded-2xl p-5 shadow-sm">
+              <div class="flex items-center justify-between mb-2">
+                <h4 class="text-xs font-mono uppercase tracking-wider text-slate-500">受光スペクトル強度</h4>
+                <span class="text-[10px] font-mono text-slate-400">REALTIME</span>
+              </div>
+              <div class="h-28 bg-slate-50 rounded-xl border border-slate-200 p-2 relative overflow-hidden shadow-inner">
+                <canvas id="spectrumCanvas" class="w-full h-full block"></canvas>
+                <div class="absolute top-2 right-2 text-[10px] font-mono text-slate-600 bg-white/90 border border-slate-200 px-1.5 py-0.5 rounded shadow-sm">
+                  Peak: 525nm
+                </div>
+              </div>
+              <div class="mt-3 grid grid-cols-2 gap-2 text-[11px] font-mono text-slate-600">
+                <div class="p-2 rounded-lg bg-slate-50 border border-slate-200">
+                  <span class="text-slate-500 block text-[10px]">R-CPL 透過光量</span>
+                  <span id="val-rcpl-lum" class="text-emerald-700 font-bold text-sm">94.2 %</span>
+                </div>
+                <div class="p-2 rounded-lg bg-slate-50 border border-slate-200">
+                  <span class="text-slate-500 block text-[10px]">L-CPL 透過光量</span>
+                  <span id="val-lcpl-lum" class="text-slate-600 font-bold text-sm">0.7 %</span>
+                </div>
+              </div>
+            </div>
+
+            <!-- 音声フィードバック -->
+            <div class="p-4 rounded-2xl bg-white border border-slate-200 text-xs text-slate-600 flex items-center justify-between shadow-sm">
+              <div class="flex items-center gap-2">
+                <svg class="w-4 h-4 text-cyan-600" fill="none" viewBox="0 0 24 24" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"/></svg>
+                <span>検光音フィードバック</span>
+              </div>
+              <button id="sound-toggle" onclick="toggleAudio()" class="px-2.5 py-1 rounded bg-slate-100 text-[11px] font-mono text-slate-600 hover:text-slate-900 border border-slate-300">
+                AUDIO: OFF
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div id="forensic-view-wave" class="hidden flex-col gap-6">
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 shadow-sm">
+          <div class="flex flex-col sm:flex-row sm:items-center justify-between pb-4 border-b border-slate-200 gap-4 mb-4">
+            <div>
+              <h3 class="text-lg font-bold text-slate-900">3D螺旋光波伝播と検光子透過シミュレーション</h3>
+              <p class="text-xs text-slate-500 mt-1">光の回転電場ベクトルが適合検光子（R-CPL）を100%透過し、直交検光子で消光される物理現象の可視化</p>
+            </div>
+            <button id="toggle-wave-anim" onclick="toggleWaveAnimation()" class="px-3 py-1.5 text-xs rounded-lg bg-cyan-50 text-cyan-700 border border-cyan-200 font-mono font-medium shadow-sm">
+              再生中 (ON)
+            </button>
+          </div>
+          <div class="bg-slate-50 rounded-xl p-4 border border-slate-200 overflow-hidden relative shadow-inner">
+            <canvas id="waveCanvas" class="w-full h-64 sm:h-72 block"></canvas>
+            <div class="absolute bottom-3 left-4 text-xs font-mono text-slate-600 bg-white/90 px-2 py-1 rounded border border-slate-200 shadow-sm backdrop-blur">
+              青: 右円偏光 (放射波) | 緑: 検光子透過光 (受光)
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="border-t border-slate-200 bg-white text-slate-500 text-xs py-4 px-4 text-center mt-auto">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-2">
+      <p>不斉自己触媒反応モデル (Asymmetric Autocatalysis) &middot; 壮亜反応 (Soai Reaction)</p>
+      <p class="text-slate-400">1995年 東京理科大学 硎井健三（そあ けんぞう）教授らにより発見</p>
+    </div>
+  </footer>
+
+  <script>
+    /* ==========================================================
+       1. タブナビゲーションロジック (ライトモード用)
+       ========================================================== */
+    function switchTab(tabId) {
+      const panes = document.querySelectorAll('.tab-pane');
+      panes.forEach(pane => pane.classList.add('hidden'));
+
+      const activePane = document.getElementById('tab-' + tabId);
+      if (activePane) {
+        activePane.classList.remove('hidden');
+      }
+
+      const buttons = document.querySelectorAll('.tab-btn');
+      buttons.forEach(btn => {
+        btn.classList.remove('text-indigo-600', 'border-indigo-600', 'bg-white', 'shadow-xs', 'font-semibold');
+        btn.classList.add('text-slate-600', 'border-transparent', 'font-medium');
+      });
+
+      const activeBtn = document.getElementById('tab-btn-' + tabId);
+      if (activeBtn) {
+        activeBtn.classList.add('text-indigo-600', 'border-indigo-600', 'bg-white', 'shadow-xs', 'font-semibold');
+        activeBtn.classList.remove('text-slate-600', 'border-transparent', 'font-medium');
+      }
+
+      if (tabId === 'overview') {
+        resizeReactionCanvas();
+      } else if (tabId === 'app1') {
+        setTimeout(() => {
+          resizeSensorCanvas();
+        }, 50);
+      } else if (tabId === 'app2') {
+        setTimeout(() => {
+          resizePharmaCanvas();
+        }, 50);
+      } else if (tabId === 'app3') {
+        setTimeout(() => {
+          resizeCanvases();
+          renderAll();
+        }, 50);
+      }
+    }
+
+    let forensicCurrentSubTab = 'inspect';
+    function switchForensicSubTab(subTab) {
+      forensicCurrentSubTab = subTab;
+      const inspectView = document.getElementById('forensic-view-inspect');
+      const waveView = document.getElementById('forensic-view-wave');
+      const navInspect = document.getElementById('forensic-subnav-inspect');
+      const navWave = document.getElementById('forensic-subnav-wave');
+
+      if (subTab === 'inspect') {
+        inspectView.classList.remove('hidden');
+        waveView.classList.add('hidden');
+        navInspect.className = "px-4 py-2 text-xs font-bold rounded-xl transition bg-cyan-600 text-white shadow-sm flex items-center gap-1.5";
+        navWave.className = "px-4 py-2 text-xs font-medium rounded-xl transition text-slate-600 hover:text-slate-900 bg-white border border-slate-200 flex items-center gap-1.5";
+        resizeCanvases();
+        renderAll();
+      } else {
+        waveView.classList.remove('hidden');
+        inspectView.classList.add('hidden');
+        navWave.className = "px-4 py-2 text-xs font-bold rounded-xl transition bg-cyan-600 text-white shadow-sm flex items-center gap-1.5";
+        navInspect.className = "px-4 py-2 text-xs font-medium rounded-xl transition text-slate-600 hover:text-slate-900 bg-white border border-slate-200 flex items-center gap-1.5";
+      }
+    }
+
+    /* ==========================================================
+       2. タブ1: 基本概要 不斉自己触媒増幅シミュレータ
+       ========================================================== */
+    const reactionCanvas = document.getElementById('reaction-canvas');
+    const rCtx = reactionCanvas.getContext('2d');
+    let particles = [];
+    const TOTAL_PARTICLES = 160;
+    let isRunning = false;
+    let simGeneration = 0;
+    let initialRatioVal = 51;
+    let dimerStrength = 4;
+    let simAnimFrameId = null;
+
+    class Molecule {
+      constructor(type, x, y, vx, vy) {
+        this.type = type; // 'R', 'S', 'dimer', 'reactant'
+        this.x = x;
+        this.y = y;
+        this.vx = vx;
+        this.vy = vy;
+        this.radius = type === 'dimer' ? 5.5 : 4.5;
+      }
+
+      update(width, height) {
+        this.x += this.vx;
+        this.y += this.vy;
+
+        if (this.x - this.radius < 0) { this.x = this.radius; this.vx *= -1; }
+        if (this.x + this.radius > width) { this.x = width - this.radius; this.vx *= -1; }
+        if (this.y - this.radius < 0) { this.y = this.radius; this.vy *= -1; }
+        if (this.y + this.radius > height) { this.y = height - this.radius; this.vy *= -1; }
+      }
+
+      draw(ctx) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+
+        if (this.type === 'R') {
+          ctx.fillStyle = '#2563eb';
+          ctx.shadowColor = 'rgba(37, 99, 235, 0.35)';
+          ctx.shadowBlur = 6;
+        } else if (this.type === 'S') {
+          ctx.fillStyle = '#dc2626';
+          ctx.shadowColor = 'rgba(220, 38, 38, 0.35)';
+          ctx.shadowBlur = 6;
+        } else if (this.type === 'dimer') {
+          ctx.fillStyle = '#94a3b8';
+          ctx.shadowBlur = 0;
+        } else {
+          ctx.fillStyle = '#cbd5e1';
+          ctx.shadowBlur = 0;
+        }
+
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    function initParticles() {
+      particles = [];
+      const w = reactionCanvas.width;
+      const h = reactionCanvas.height;
+
+      const numR = Math.round(TOTAL_PARTICLES * (initialRatioVal / 100));
+      const numS = TOTAL_PARTICLES - numR;
+
+      // 反応速度を60%に調整 (分子移動速度を0.6倍に設定)
+      for (let i = 0; i < numR; i++) {
+        const speed = (1.0 + Math.random() * 0.8) * 0.6;
+        const angle = Math.random() * Math.PI * 2;
+        particles.push(new Molecule('R', Math.random() * (w - 20) + 10, Math.random() * (h - 20) + 10, Math.cos(angle) * speed, Math.sin(angle) * speed));
+      }
+
+      for (let i = 0; i < numS; i++) {
+        const speed = (1.0 + Math.random() * 0.8) * 0.6;
+        const angle = Math.random() * Math.PI * 2;
+        particles.push(new Molecule('S', Math.random() * (w - 20) + 10, Math.random() * (h - 20) + 10, Math.cos(angle) * speed, Math.sin(angle) * speed));
+      }
+
+      simGeneration = 0;
+      updateStats();
+    }
+
+    function stepSimulation() {
+      const w = reactionCanvas.width;
+      const h = reactionCanvas.height;
+
+      for (let i = 0; i < particles.length; i++) {
+        particles[i].update(w, h);
+      }
+
+      // 衝突・反応ペースを60%速度に合わせて緩和
+      if (simGeneration % 6 === 0) {
+        for (let i = 0; i < particles.length; i++) {
+          for (let j = i + 1; j < particles.length; j++) {
+            const p1 = particles[i];
+            const p2 = particles[j];
+            const dx = p1.x - p2.x;
+            const dy = p1.y - p2.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < 18) {
+              if (dimerStrength > 1 && ((p1.type === 'R' && p2.type === 'S') || (p1.type === 'S' && p2.type === 'R'))) {
+                if (Math.random() < 0.16 * (dimerStrength / 3) * 0.6) {
+                  p1.type = 'dimer';
+                  p2.type = 'dimer';
+                }
+              }
+
+              let countR = particles.filter(p => p.type === 'R').length;
+              let countS = particles.filter(p => p.type === 'S').length;
+
+              if (p1.type === 'dimer' || p1.type === 'reactant') {
+                const probR = (countR * countR) / (countR * countR + countS * countS + 0.0001);
+                if (Math.random() < probR * 0.22 * 0.6) {
+                  p1.type = 'R';
+                } else if (Math.random() < (1 - probR) * 0.22 * 0.6) {
+                  p1.type = 'S';
+                }
+              }
+            }
+          }
+        }
+      }
+
+      simGeneration++;
+      updateStats();
+    }
+
+    function renderReactionCanvas() {
+      rCtx.clearRect(0, 0, reactionCanvas.width, reactionCanvas.height);
+
+      rCtx.strokeStyle = 'rgba(226, 232, 240, 0.8)';
+      rCtx.lineWidth = 1;
+      const step = 30;
+      for (let x = 0; x < reactionCanvas.width; x += step) {
+        rCtx.beginPath();
+        rCtx.moveTo(x, 0);
+        rCtx.lineTo(x, reactionCanvas.height);
+        rCtx.stroke();
+      }
+      for (let y = 0; y < reactionCanvas.height; y += step) {
+        rCtx.beginPath();
+        rCtx.moveTo(0, y);
+        rCtx.lineTo(reactionCanvas.width, y);
+        rCtx.stroke();
+      }
+
+      particles.forEach(p => p.draw(rCtx));
+
+      if (isRunning) {
+        stepSimulation();
+        simAnimFrameId = requestAnimationFrame(renderReactionCanvas);
+      }
+    }
+
+    function updateStats() {
+      const activeR = particles.filter(p => p.type === 'R').length;
+      const activeS = particles.filter(p => p.type === 'S').length;
+      const totalActive = activeR + activeS;
+
+      let rPercent = 50.0;
+      let sPercent = 50.0;
+      let ee = 0.0;
+
+      if (totalActive > 0) {
+        rPercent = ((activeR / totalActive) * 100).toFixed(1);
+        sPercent = ((activeS / totalActive) * 100).toFixed(1);
+        ee = (((activeR - activeS) / totalActive) * 100).toFixed(1);
+      }
+
+      document.getElementById('count-r').innerText = `${activeR} (${rPercent}%)`;
+      document.getElementById('count-s').innerText = `${activeS} (${sPercent}%)`;
+      document.getElementById('val-ee').innerText = `${ee >= 0 ? '+' : ''}${ee}%`;
+      document.getElementById('generation-counter').innerText = `${Math.floor(simGeneration / 10)} サイクル`;
+    }
+
+    function toggleSimulation() {
+      isRunning = !isRunning;
+      const label = document.getElementById('sim-start-label');
+      const icon = document.getElementById('sim-play-icon');
+
+      if (isRunning) {
+        label.innerText = '一時停止';
+        icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 9v6m4-6v6m7-3a9 9 0 11-18 0 9 9 0 0118 0z" />';
+        renderReactionCanvas();
+      } else {
+        label.innerText = '再開';
+        icon.innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />';
+        cancelAnimationFrame(simAnimFrameId);
+      }
+    }
+
+    function resetSimulation() {
+      isRunning = false;
+      cancelAnimationFrame(simAnimFrameId);
+      document.getElementById('sim-start-label').innerText = '反応開始';
+      document.getElementById('sim-play-icon').innerHTML = '<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />';
+      initParticles();
+      renderReactionCanvas();
+    }
+
+    function updateInitialRatio(val) {
+      initialRatioVal = parseFloat(val);
+      const other = (100 - initialRatioVal).toFixed(1);
+      document.getElementById('slider-ratio-label').innerText = `${initialRatioVal}% : ${other}%`;
+      resetSimulation();
+    }
+
+    function updateDimerStrength(val) {
+      dimerStrength = parseInt(val, 10);
+      const labels = ['無効 (線形)', '弱', '中', '高（増幅加速）', '極めて強力'];
+      document.getElementById('slider-dimer-label').innerText = labels[dimerStrength - 1];
+    }
+
+    function resizeReactionCanvas() {
+      const rect = reactionCanvas.parentElement.getBoundingClientRect();
+      reactionCanvas.width = rect.width;
+      reactionCanvas.height = rect.height;
+      if (particles.length === 0) {
+        initParticles();
+      }
+      renderReactionCanvas();
+    }
+
+    /* ==========================================================
+       STREAMING_CHUNK:Tab 2 Continuous Flow Reactor Simulator Logic...
+       ========================================================== */
+    const pharmaCanvas = document.getElementById('pharma-reactor-canvas');
+    const pCtx = pharmaCanvas.getContext('2d');
+    let pharmaParticles = [];
+    let pharmaSparks = [];
+    let pharmaMode = 'autocat'; // 'autocat' | 'traditional'
+    let currentPharmaYield = 100;
+    let traditionalCatalystGrams = 12.5;
+    let pharmaAnimFrameId = null;
+
+    class PharmaMolecule {
+      constructor(type, x, y, vx, vy) {
+        this.type = type; // 'product' (右手型薬効分子/自己触媒), 'raw' (アキラル原料), 'metal' (貴金属触媒)
+        this.x = x;
+        this.y = y;
+        this.vx = vx;
+        this.vy = vy;
+        this.radius = type === 'metal' ? 5.5 : (type === 'product' ? 4.5 : 4.0);
+        this.pulse = Math.random() * Math.PI * 2;
+      }
+
+      update(width, height) {
+        this.x += this.vx;
+        this.y += this.vy;
+        this.pulse += 0.05;
+
+        if (this.x - this.radius < 0) { this.x = this.radius; this.vx *= -1; }
+        if (this.x + this.radius > width) { this.x = width - this.radius; this.vx *= -1; }
+        if (this.y - this.radius < 0) { this.y = this.radius; this.vy *= -1; }
+        if (this.y + this.radius > height) { this.y = height - this.radius; this.vy *= -1; }
+      }
+
+      draw(ctx) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+
+        if (this.type === 'product') {
+          ctx.fillStyle = '#3b82f6'; // 右手型薬効分子
+          ctx.shadowColor = 'rgba(59, 130, 246, 0.7)';
+          ctx.shadowBlur = 8;
+        } else if (this.type === 'raw') {
+          ctx.fillStyle = '#94a3b8'; // アキラル原料
+          ctx.shadowBlur = 0;
+        } else if (this.type === 'metal') {
+          ctx.fillStyle = '#f59e0b'; // 外部貴金属触媒 (Ru/Rh)
+          ctx.shadowColor = 'rgba(245, 158, 11, 0.9)';
+          ctx.shadowBlur = 10;
+        }
+
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    function initPharmaParticles() {
+      pharmaParticles = [];
+      pharmaSparks = [];
+      const w = pharmaCanvas.width || 600;
+      const h = pharmaCanvas.height || 260;
+
+      // 60%の速度で穏やかに運動
+      const numProducts = 40;
+      for (let i = 0; i < numProducts; i++) {
+        const speed = (0.9 + Math.random() * 0.7) * 0.6;
+        const angle = Math.random() * Math.PI * 2;
+        pharmaParticles.push(new PharmaMolecule('product', Math.random() * (w - 20) + 10, Math.random() * (h - 20) + 10, Math.cos(angle) * speed, Math.sin(angle) * speed));
+      }
+
+      if (pharmaMode === 'traditional') {
+        for (let i = 0; i < 8; i++) {
+          const speed = 0.5 * 0.6;
+          const angle = Math.random() * Math.PI * 2;
+          pharmaParticles.push(new PharmaMolecule('metal', Math.random() * (w - 20) + 10, Math.random() * (h - 20) + 10, Math.cos(angle) * speed, Math.sin(angle) * speed));
+        }
+      }
+      updatePharmaTelemetry();
+    }
+
+    function addPharmaSpark(x, y, color) {
+      pharmaSparks.push({
+        x: x,
+        y: y,
+        color: color,
+        life: 1.0,
+        radius: 3 + Math.random() * 4
+      });
+    }
+
+    function setPharmaMode(mode) {
+      pharmaMode = mode;
+      const btnAuto = document.getElementById('btn-mode-autocat');
+      const btnTrad = document.getElementById('btn-mode-trad');
+      const badge = document.getElementById('pharma-reactor-badge');
+      const metalLegend = document.getElementById('pharma-legend-metal');
+      const cardTrad = document.getElementById('card-trad-method');
+      const cardAuto = document.getElementById('card-autocat-method');
+
+      if (mode === 'autocat') {
+        btnAuto.className = "px-3 py-1.5 rounded-lg font-bold bg-indigo-600 text-white shadow-xs transition";
+        btnTrad.className = "px-3 py-1.5 rounded-lg font-medium text-slate-600 hover:text-slate-900 transition";
+        badge.innerText = "自己増殖稼働中";
+        badge.className = "text-xs bg-emerald-50 text-emerald-700 px-2.5 py-0.5 rounded-full border border-emerald-200 font-mono";
+        metalLegend.classList.add('hidden');
+        cardAuto.classList.add('border-2', 'border-indigo-400');
+        cardTrad.classList.remove('border-2', 'border-red-400');
+      } else {
+        btnTrad.className = "px-3 py-1.5 rounded-lg font-bold bg-red-600 text-white shadow-xs transition";
+        btnAuto.className = "px-3 py-1.5 rounded-lg font-medium text-slate-600 hover:text-slate-900 transition";
+        badge.innerText = "外部触媒添加中 (重金属リスク有)";
+        badge.className = "text-xs bg-red-50 text-red-700 px-2.5 py-0.5 rounded-full border border-red-200 font-mono";
+        metalLegend.classList.remove('hidden');
+        cardTrad.classList.add('border-2', 'border-red-400');
+        cardAuto.classList.remove('border-2', 'border-indigo-400');
+      }
+
+      resetPharmaReactor();
+    }
+
+    function feedRawMaterials() {
+      currentPharmaYield += 150;
+      const nozzleLabel = document.getElementById('pharma-feeder-label');
+      nozzleLabel.innerText = "原料投入中 (+150 g 流入)";
+      nozzleLabel.parentElement.classList.add('ring-2', 'ring-cyan-400');
+
+      if (window.Tone && forensicState.audioEnabled) {
+        initAudio();
+        synth.triggerAttackRelease(["C4", "E4", "G4"], "16n");
+      }
+
+      const w = pharmaCanvas.width;
+      // 原料分子 (グレー) を上部ノズルから投下 (速度60%)
+      for (let i = 0; i < 24; i++) {
+        setTimeout(() => {
+          const speed = (1.2 + Math.random() * 0.8) * 0.6;
+          const angle = Math.PI / 2 + (Math.random() - 0.5) * 0.8;
+          pharmaParticles.push(new PharmaMolecule('raw', w / 2 + (Math.random() - 0.5) * 40, 15, Math.cos(angle) * speed, Math.sin(angle) * speed));
+          addPharmaSpark(w / 2, 20, '#38bdf8');
+        }, i * 40);
+      }
+
+      if (pharmaMode === 'traditional') {
+        traditionalCatalystGrams += 3.5;
+        // 従来法は毎回外部貴金属触媒も注入
+        setTimeout(() => {
+          for (let k = 0; k < 2; k++) {
+            const speed = 0.6 * 0.6;
+            const angle = Math.random() * Math.PI * 2;
+            pharmaParticles.push(new PharmaMolecule('metal', w / 2 + (Math.random() - 0.5) * 20, 25, Math.cos(angle) * speed, Math.sin(angle) * speed));
+            addPharmaSpark(w / 2, 25, '#f59e0b');
+          }
+        }, 300);
+      }
+
+      setTimeout(() => {
+        nozzleLabel.innerText = "原料自動フィード口 (待機中)";
+        nozzleLabel.parentElement.classList.remove('ring-2', 'ring-cyan-400');
+      }, 1400);
+
+      updatePharmaTelemetry();
+    }
+
+    function resetPharmaReactor() {
+      currentPharmaYield = 100;
+      traditionalCatalystGrams = 12.5;
+      initPharmaParticles();
+      updatePharmaTelemetry();
+    }
+
+    function updatePharmaTelemetry() {
+      const yieldElem = document.getElementById('pharma-yield-val');
+      const catUsedElem = document.getElementById('pharma-catalyst-used');
+      const catSubElem = document.getElementById('pharma-catalyst-sub');
+      const tonElem = document.getElementById('pharma-ton-val');
+
+      yieldElem.innerText = `${currentPharmaYield.toLocaleString()} g`;
+
+      if (pharmaMode === 'autocat') {
+        catUsedElem.innerHTML = `1.0 <span class="text-xs font-normal text-slate-500">mg (固定)</span>`;
+        catSubElem.innerText = "最初の一回きり (以後は自己増殖)";
+        tonElem.innerText = `${Math.round(currentPharmaYield * 1000).toLocaleString()}+`;
+      } else {
+        catUsedElem.innerHTML = `${traditionalCatalystGrams.toFixed(1)} <span class="text-xs font-normal text-slate-500">g (累積添加)</span>`;
+        catSubElem.innerText = "原料投入毎に貴金属触媒の追加購入が必須";
+        tonElem.innerText = "200 ~ 500 (上限)";
+      }
+    }
+
+    function stepPharmaReactor() {
+      const w = pharmaCanvas.width;
+      const h = pharmaCanvas.height;
+
+      for (let i = 0; i < pharmaParticles.length; i++) {
+        pharmaParticles[i].update(w, h);
+      }
+
+      let rawCount = 0;
+      let productCount = 0;
+
+      // 衝突による自己触媒変換 (60%速度に合わせた自然な変換頻度)
+      for (let i = 0; i < pharmaParticles.length; i++) {
+        if (pharmaParticles[i].type === 'raw') rawCount++;
+        if (pharmaParticles[i].type === 'product') productCount++;
+
+        for (let j = i + 1; j < pharmaParticles.length; j++) {
+          const p1 = pharmaParticles[i];
+          const p2 = pharmaParticles[j];
+          const dx = p1.x - p2.x;
+          const dy = p1.y - p2.y;
+          const dist = Math.sqrt(dx * dx + dy * dy);
+
+          if (dist < 16) {
+            if (pharmaMode === 'autocat') {
+              // 不斉自己触媒: 生成物 (青) が原料 (灰) に触れると、原料が青色の薬効分子へと自己触媒変換！
+              if (p1.type === 'product' && p2.type === 'raw') {
+                if (Math.random() < 0.28 * 0.6) {
+                  p2.type = 'product';
+                  addPharmaSpark(p2.x, p2.y, '#38bdf8');
+                }
+              } else if (p2.type === 'product' && p1.type === 'raw') {
+                if (Math.random() < 0.28 * 0.6) {
+                  p1.type = 'product';
+                  addPharmaSpark(p1.x, p1.y, '#38bdf8');
+                }
+              }
+            } else {
+              // 従来法: 貴金属触媒 (黄) に触れた時のみ原料が変換される
+              if (p1.type === 'metal' && p2.type === 'raw') {
+                if (Math.random() < 0.35 * 0.6) {
+                  p2.type = 'product';
+                  addPharmaSpark(p2.x, p2.y, '#38bdf8');
+                }
+              } else if (p2.type === 'metal' && p1.type === 'raw') {
+                if (Math.random() < 0.35 * 0.6) {
+                  p1.type = 'product';
+                  addPharmaSpark(p1.x, p1.y, '#38bdf8');
+                }
+              }
+            }
+          }
+        }
+      }
+
+      const totalMoles = rawCount + productCount;
+      const convRate = totalMoles > 0 ? Math.round((productCount / totalMoles) * 100) : 100;
+      document.getElementById('pharma-conversion-rate').innerText = `${convRate}%`;
+
+      // スパーク減衰 (60%速度)
+      for (let k = pharmaSparks.length - 1; k >= 0; k--) {
+        const sp = pharmaSparks[k];
+        sp.life -= 0.048;
+        if (sp.life <= 0) {
+          pharmaSparks.splice(k, 1);
+        }
+      }
+    }
+
+    function renderPharmaReactor() {
+      pCtx.clearRect(0, 0, pharmaCanvas.width, pharmaCanvas.height);
+
+      // リアクター背景グリッド
+      pCtx.strokeStyle = 'rgba(51, 65, 85, 0.4)';
+      pCtx.lineWidth = 1;
+      const step = 30;
+      for (let x = 0; x < pharmaCanvas.width; x += step) {
+        pCtx.beginPath();
+        pCtx.moveTo(x, 0);
+        pCtx.lineTo(x, pharmaCanvas.height);
+        pCtx.stroke();
+      }
+      for (let y = 0; y < pharmaCanvas.height; y += step) {
+        pCtx.beginPath();
+        pCtx.moveTo(0, y);
+        pCtx.lineTo(pharmaCanvas.width, y);
+        pCtx.stroke();
+      }
+
+      pharmaParticles.forEach(p => p.draw(pCtx));
+
+      // スパーク描画
+      pharmaSparks.forEach(sp => {
+        pCtx.save();
+        pCtx.beginPath();
+        pCtx.arc(sp.x, sp.y, sp.radius * (2 - sp.life), 0, Math.PI * 2);
+        pCtx.fillStyle = sp.color;
+        pCtx.globalAlpha = Math.max(0, sp.life);
+        pCtx.shadowColor = sp.color;
+        pCtx.shadowBlur = 10;
+        pCtx.fill();
+        pCtx.restore();
+      });
+
+      stepPharmaReactor();
+      pharmaAnimFrameId = requestAnimationFrame(renderPharmaReactor);
+    }
+
+    function resizePharmaCanvas() {
+      const rect = pharmaCanvas.parentElement.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) {
+        pharmaCanvas.width = rect.width;
+        pharmaCanvas.height = rect.height;
+        if (pharmaParticles.length === 0) {
+          initPharmaParticles();
+        }
+      }
+    }
+
+    /* ==========================================================
+       STREAMING_CHUNK:Tab 1 Chiral Sensor Reactor State & Mechanics...
+       ========================================================== */
+    const sensorCanvas = document.getElementById('sensor-reactor-canvas');
+    const sCtx = sensorCanvas ? sensorCanvas.getContext('2d') : null;
+    let sensorParticles = [];
+    let sensorSparks = [];
+    let selectedSensorSample = null;
+    let sensorReactorRunning = false;
+    let sensorSimProgress = 0;
+    let sensorAnimFrameId = null;
+
+    const sensorData = {
+      'heavy-water': {
+        name: '重水素（D）置換キラル分子',
+        inputR: 50.005,
+        inputS: 49.995,
+        desc: 'わずか0.01%の同位体差',
+        finalR: 99.7,
+        finalS: 0.3,
+        detectedType: '右手型 (R) 選択的優位',
+        gainFactor: '10,000'
+      },
+      'quartz': {
+        name: 'd-石英（右巻き水晶パウダー）',
+        inputR: 50.05,
+        inputS: 49.95,
+        desc: '無機鉱物結晶表面のらせんキラル誘導',
+        finalR: 99.9,
+        finalS: 0.1,
+        detectedType: '右手型 (R) 選択的優位',
+        gainFactor: '2,000'
+      },
+      'cpl-light': {
+        name: '右円偏光（CPL）極微小照射',
+        inputR: 50.001,
+        inputS: 49.999,
+        desc: '光子の回転角運動量による偏光非対称性',
+        finalR: 99.4,
+        finalS: 0.6,
+        detectedType: '右手型 (R) 選択的優位',
+        gainFactor: '50,000'
+      }
+    };
+
+    class SensorParticle {
+      constructor(type, x, y, vx, vy) {
+        this.type = type; // 'reactant', 'seed', 'R', 'S', 'dimer'
+        this.x = x;
+        this.y = y;
+        this.vx = vx;
+        this.vy = vy;
+        this.radius = type === 'seed' ? 6 : (type === 'dimer' ? 5 : 4);
+      }
+
+      update(width, height) {
+        this.x += this.vx;
+        this.y += this.vy;
+
+        if (this.x - this.radius < 0) { this.x = this.radius; this.vx *= -1; }
+        if (this.x + this.radius > width) { this.x = width - this.radius; this.vx *= -1; }
+        if (this.y - this.radius < 0) { this.y = this.radius; this.vy *= -1; }
+        if (this.y + this.radius > height) { this.y = height - this.radius; this.vy *= -1; }
+      }
+
+      draw(ctx) {
+        ctx.save();
+        ctx.beginPath();
+        ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+
+        if (this.type === 'seed') {
+          ctx.fillStyle = '#22d3ee';
+          ctx.shadowColor = 'rgba(34, 211, 238, 0.9)';
+          ctx.shadowBlur = 12;
+        } else if (this.type === 'R') {
+          ctx.fillStyle = '#3b82f6';
+          ctx.shadowColor = 'rgba(59, 130, 246, 0.7)';
+          ctx.shadowBlur = 8;
+        } else if (this.type === 'S') {
+          ctx.fillStyle = '#f43f5e';
+          ctx.shadowColor = 'rgba(244, 63, 94, 0.7)';
+          ctx.shadowBlur = 8;
+        } else if (this.type === 'dimer') {
+          ctx.fillStyle = '#f59e0b';
+          ctx.shadowBlur = 0;
+        } else {
+          ctx.fillStyle = '#94a3b8';
+          ctx.shadowBlur = 0;
+        }
+
+        ctx.fill();
+        ctx.restore();
+      }
+    }
+
+    function initSensorReactorParticles() {
+      if (!sensorCanvas) return;
+      sensorParticles = [];
+      sensorSparks = [];
+      const w = sensorCanvas.width || 500;
+      const h = sensorCanvas.height || 220;
+
+      // 60%の速度で穏やかに運動する原料分子 (未反応アキラル体)
+      for (let i = 0; i < 48; i++) {
+        const speed = (0.9 + Math.random() * 0.7) * 0.6;
+        const angle = Math.random() * Math.PI * 2;
+        sensorParticles.push(new SensorParticle(
+          'reactant',
+          Math.random() * (w - 20) + 10,
+          Math.random() * (h - 20) + 10,
+          Math.cos(angle) * speed,
+          Math.sin(angle) * speed
+        ));
+      }
+
+      // 少数の自然ゆらぎ分子
+      for (let i = 0; i < 3; i++) {
+        const speed = 0.5 * 0.6;
+        const angle = Math.random() * Math.PI * 2;
+        sensorParticles.push(new SensorParticle('R', Math.random() * (w - 20) + 10, Math.random() * (h - 20) + 10, Math.cos(angle) * speed, Math.sin(angle) * speed));
+      }
+      for (let i = 0; i < 3; i++) {
+        const speed = 0.5 * 0.6;
+        const angle = Math.random() * Math.PI * 2;
+        sensorParticles.push(new SensorParticle('S', Math.random() * (w - 20) + 10, Math.random() * (h - 20) + 10, Math.cos(angle) * speed, Math.sin(angle) * speed));
+      }
+    }
+
+    function addSpark(x, y, color) {
+      sensorSparks.push({
+        x: x,
+        y: y,
+        color: color,
+        life: 1.0,
+        radius: 3 + Math.random() * 4
+      });
+    }
+
+    function updateSensorPhaseUI(step) {
+      for (let i = 1; i <= 4; i++) {
+        const el = document.getElementById(`phase-step-${i}`);
+        if (!el) continue;
+        if (i < step) {
+          el.className = 'p-1.5 rounded bg-emerald-50 text-emerald-700 border border-emerald-300 font-bold transition';
+        } else if (i === step) {
+          el.className = 'p-1.5 rounded bg-cyan-600 text-white border border-cyan-500 font-bold shadow-xs transition animate-pulse';
+        } else {
+          el.className = 'p-1.5 rounded bg-slate-100 text-slate-400 border border-slate-200 transition';
+        }
+      }
+    }
+
+    function selectSensorSample(type) {
+      selectedSensorSample = type;
+      document.querySelectorAll('.sensor-sample-btn').forEach(btn => {
+        btn.classList.remove('border-emerald-500', 'bg-emerald-50');
+      });
+      const targetBtn = document.getElementById('sample-btn-' + type);
+      if (targetBtn) {
+        targetBtn.classList.add('border-emerald-500', 'bg-emerald-50');
+      }
+
+      const injectBtn = document.getElementById('sensor-inject-btn');
+      if (injectBtn) injectBtn.removeAttribute('disabled');
+
+      const badge = document.getElementById('sensor-status-badge');
+      if (badge) {
+        badge.innerText = '準備完了 (READY)';
+        badge.className = 'px-2.5 py-1 text-xs rounded-full bg-indigo-50 text-indigo-700 font-mono border border-indigo-200';
+      }
+      const stepText = document.getElementById('sensor-step-text');
+      if (stepText) stepText.innerText = '準備完了: 滴下ボタンを押して自己触媒増幅を開始';
+    }
+
+    function runSensorTest() {
+      if (!selectedSensorSample) return;
+      const data = sensorData[selectedSensorSample];
+
+      sensorReactorRunning = true;
+      sensorSimProgress = 0;
+
+      const dropper = document.getElementById('sensor-dropper');
+      if (dropper) {
+        dropper.style.opacity = '1';
+        dropper.style.top = '10px';
+      }
+
+      if (window.Tone && forensicState.audioEnabled) {
+        initAudio();
+        synth.triggerAttackRelease(["E4", "G4", "C5"], "8n");
+      }
+
+      // シード滴下アニメーション
+      setTimeout(() => {
+        const w = sensorCanvas.width;
+        for (let i = 0; i < 4; i++) {
+          const speed = (0.8 + Math.random() * 0.5) * 0.6;
+          const angle = Math.PI / 2 + (Math.random() - 0.5) * 0.6;
+          sensorParticles.push(new SensorParticle(
+            'seed',
+            w / 2 + (Math.random() - 0.5) * 30,
+            25,
+            Math.cos(angle) * speed,
+            Math.sin(angle) * speed
+          ));
+          addSpark(w / 2, 25, '#22d3ee');
+        }
+      }, 400);
+
+      setTimeout(() => {
+        if (dropper) {
+          dropper.style.opacity = '0';
+          dropper.style.top = '-50px';
+        }
+      }, 1200);
+
+      const statusBadge = document.getElementById('sensor-status-badge');
+      if (statusBadge) {
+        statusBadge.innerText = '自己触媒増幅中...';
+        statusBadge.className = 'px-2.5 py-1 text-xs rounded-full bg-amber-50 text-amber-800 font-mono border border-amber-300 animate-pulse';
+      }
+
+      const inputLabel = document.getElementById('sensor-input-label');
+      if (inputLabel) {
+        inputLabel.innerText = `R: ${data.inputR}% / S: ${data.inputS}% (極微差: +${(data.inputR - data.inputS).toFixed(3)}%)`;
+      }
+      const barInputR = document.getElementById('sensor-bar-input-r');
+      const barInputS = document.getElementById('sensor-bar-input-s');
+      if (barInputR) barInputR.style.width = data.inputR + '%';
+      if (barInputS) barInputS.style.width = data.inputS + '%';
+
+      let targetGain = parseInt(data.gainFactor.replace(',', ''), 10);
+      let stepCount = 0;
+      const totalSteps = 47; // 速度60%に対応した穏やかな進行
+
+      const interval = setInterval(() => {
+        stepCount++;
+        sensorSimProgress = (stepCount / totalSteps) * 100;
+        let progress = stepCount / totalSteps;
+
+        if (progress < 0.25) {
+          updateSensorPhaseUI(1);
+          const st = document.getElementById('sensor-step-text');
+          if (st) st.innerText = 'フェーズ①: 極微キラルシード滴下・認識';
+        } else if (progress < 0.55) {
+          updateSensorPhaseUI(2);
+          const st = document.getElementById('sensor-step-text');
+          if (st) st.innerText = 'フェーズ②: 生成物が自らを増殖 (自己触媒連鎖)';
+        } else if (progress < 0.85) {
+          updateSensorPhaseUI(3);
+          const st = document.getElementById('sensor-step-text');
+          if (st) st.innerText = 'フェーズ③: 逆キラリティ(S型)との相互不活性化';
+        } else {
+          updateSensorPhaseUI(4);
+          const st = document.getElementById('sensor-step-text');
+          if (st) st.innerText = 'フェーズ④: 99.8% ee への単一掌性収束完了！';
+        }
+
+        let curR = 50 + (data.finalR - 50) * Math.pow(progress, 1.3);
+        let curS = 100 - curR;
+
+        const barAmpR = document.getElementById('sensor-bar-amp-r');
+        const barAmpS = document.getElementById('sensor-bar-amp-s');
+        const ampText = document.getElementById('sensor-amp-text');
+        const gainLabel = document.getElementById('sensor-gain-label');
+
+        if (barAmpR) barAmpR.style.width = curR + '%';
+        if (barAmpS) barAmpS.style.width = curS + '%';
+        if (ampText) ampText.innerText = `${curR.toFixed(1)}% : ${curS.toFixed(1)}%`;
+        if (gainLabel) gainLabel.innerText = `ゲイン: ${Math.round(targetGain * Math.pow(progress, 2)).toLocaleString()}x`;
+
+        if (stepCount >= totalSteps) {
+          clearInterval(interval);
+          sensorReactorRunning = false;
+          updateSensorPhaseUI(5);
+
+          if (statusBadge) {
+            statusBadge.innerText = '分析完了 (COMPLETE)';
+            statusBadge.className = 'px-2.5 py-1 text-xs rounded-full bg-emerald-50 text-emerald-800 font-mono border border-emerald-300';
+          }
+          const indLight = document.getElementById('sensor-indicator-light');
+          if (indLight) indLight.className = 'w-4 h-4 rounded-full bg-emerald-500 shadow-md shadow-emerald-500/50';
+
+          const resTitle = document.getElementById('sensor-result-title');
+          if (resTitle) {
+            resTitle.innerText = `${data.detectedType} を明確に検出！`;
+            resTitle.className = 'text-sm font-bold text-emerald-700';
+          }
+          const resDesc = document.getElementById('sensor-result-desc');
+          if (resDesc) resDesc.innerText = `最終生成比率: R型 ${data.finalR}% / S型 ${data.finalS}% (${data.desc})`;
+
+          const factor = document.getElementById('sensor-factor');
+          if (factor) factor.innerText = `${data.gainFactor} 倍`;
+
+          if (window.Tone && forensicState.audioEnabled) {
+            synth.triggerAttackRelease(["C5", "E5", "G5", "C6"], "8n");
+          }
+        }
+      }, 100);
+    }
+
+    function resetSensorTest() {
+      selectedSensorSample = null;
+      sensorReactorRunning = false;
+      sensorSimProgress = 0;
+      document.querySelectorAll('.sensor-sample-btn').forEach(btn => {
+        btn.classList.remove('border-emerald-500', 'bg-emerald-50');
+      });
+      const injectBtn = document.getElementById('sensor-inject-btn');
+      if (injectBtn) injectBtn.setAttribute('disabled', 'true');
+
+      const badge = document.getElementById('sensor-status-badge');
+      if (badge) {
+        badge.innerText = '待機中 (IDLE)';
+        badge.className = 'px-2.5 py-1 text-xs rounded-full bg-slate-100 text-slate-600 font-mono border border-slate-200';
+      }
+      const indLight = document.getElementById('sensor-indicator-light');
+      if (indLight) indLight.className = 'w-4 h-4 rounded-full bg-slate-300';
+
+      const resTitle = document.getElementById('sensor-result-title');
+      if (resTitle) resTitle.innerText = 'サンプル未投入';
+      const resDesc = document.getElementById('sensor-result-desc');
+      if (resDesc) resDesc.innerText = '検体を選択して滴下ボタンを押すと反応が始まります';
+
+      const factor = document.getElementById('sensor-factor');
+      if (factor) factor.innerText = '0 倍';
+
+      const inLab = document.getElementById('sensor-input-label');
+      if (inLab) inLab.innerText = '未検出';
+
+      const gainLab = document.getElementById('sensor-gain-label');
+      if (gainLab) gainLab.innerText = 'ゲイン: 1x';
+
+      const barInR = document.getElementById('sensor-bar-input-r');
+      const barInS = document.getElementById('sensor-bar-input-s');
+      if (barInR) barInR.style.width = '50%';
+      if (barInS) barInS.style.width = '50%';
+
+      const barAmpR = document.getElementById('sensor-bar-amp-r');
+      const barAmpS = document.getElementById('sensor-bar-amp-s');
+      if (barAmpR) barAmpR.style.width = '50%';
+      if (barAmpS) barAmpS.style.width = '50%';
+
+      const ampText = document.getElementById('sensor-amp-text');
+      if (ampText) ampText.innerText = '50% : 50%';
+
+      const stepText = document.getElementById('sensor-step-text');
+      if (stepText) stepText.innerText = '待機: サンプルを選択してください';
+
+      updateSensorPhaseUI(0);
+      initSensorReactorParticles();
+    }
+
+    function stepSensorReactor() {
+      if (!sensorCanvas) return;
+      const w = sensorCanvas.width;
+      const h = sensorCanvas.height;
+
+      for (let i = 0; i < sensorParticles.length; i++) {
+        sensorParticles[i].update(w, h);
+      }
+
+      if (sensorReactorRunning) {
+        const pNorm = sensorSimProgress / 100;
+
+        for (let i = 0; i < sensorParticles.length; i++) {
+          for (let j = i + 1; j < sensorParticles.length; j++) {
+            const p1 = sensorParticles[i];
+            const p2 = sensorParticles[j];
+            const dx = p1.x - p2.x;
+            const dy = p1.y - p2.y;
+            const dist = Math.sqrt(dx * dx + dy * dy);
+
+            if (dist < 16) {
+              if ((p1.type === 'seed' || p1.type === 'R') && p2.type === 'reactant') {
+                if (Math.random() < (0.28 + pNorm * 0.45) * 0.6) {
+                  p2.type = 'R';
+                  addSpark(p2.x, p2.y, '#38bdf8');
+                }
+              } else if ((p2.type === 'seed' || p2.type === 'R') && p1.type === 'reactant') {
+                if (Math.random() < (0.28 + pNorm * 0.45) * 0.6) {
+                  p1.type = 'R';
+                  addSpark(p1.x, p1.y, '#38bdf8');
+                }
+              }
+
+              if ((p1.type === 'R' && p2.type === 'S') || (p1.type === 'S' && p2.type === 'R')) {
+                if (Math.random() < 0.35 * 0.6) {
+                  p1.type = 'dimer';
+                  p2.type = 'dimer';
+                  addSpark((p1.x + p2.x) / 2, (p1.y + p2.y) / 2, '#f59e0b');
+                }
+              }
+
+              if (pNorm > 0.6 && (p1.type === 'dimer' || p1.type === 'S') && Math.random() < 0.15 * 0.6) {
+                p1.type = 'R';
+                addSpark(p1.x, p1.y, '#60a5fa');
+              }
+            }
+          }
+        }
+      }
+
+      for (let k = sensorSparks.length - 1; k >= 0; k--) {
+        const sp = sensorSparks[k];
+        sp.life -= 0.048;
+        if (sp.life <= 0) {
+          sensorSparks.splice(k, 1);
+        }
+      }
+    }
+
+    function renderSensorReactor() {
+      if (!sensorCanvas || !sCtx) return;
+      sCtx.clearRect(0, 0, sensorCanvas.width, sensorCanvas.height);
+
+      sCtx.strokeStyle = 'rgba(51, 65, 85, 0.4)';
+      sCtx.lineWidth = 1;
+      const step = 25;
+      for (let x = 0; x < sensorCanvas.width; x += step) {
+        sCtx.beginPath();
+        sCtx.moveTo(x, 0);
+        sCtx.lineTo(x, sensorCanvas.height);
+        sCtx.stroke();
+      }
+      for (let y = 0; y < sensorCanvas.height; y += step) {
+        sCtx.beginPath();
+        sCtx.moveTo(0, y);
+        sCtx.lineTo(sensorCanvas.width, y);
+        sCtx.stroke();
+      }
+
+      sensorParticles.forEach(p => p.draw(sCtx));
+
+      sensorSparks.forEach(sp => {
+        sCtx.save();
+        sCtx.beginPath();
+        sCtx.arc(sp.x, sp.y, sp.radius * (2 - sp.life), 0, Math.PI * 2);
+        sCtx.fillStyle = sp.color;
+        sCtx.globalAlpha = Math.max(0, sp.life);
+        sCtx.shadowColor = sp.color;
+        sCtx.shadowBlur = 10;
+        sCtx.fill();
+        sCtx.restore();
+      });
+
+      stepSensorReactor();
+      sensorAnimFrameId = requestAnimationFrame(renderSensorReactor);
+    }
+
+    function resizeSensorCanvas() {
+      if (!sensorCanvas) return;
+      const rect = sensorCanvas.parentElement.getBoundingClientRect();
+      if (rect.width > 0 && rect.height > 0) {
+        sensorCanvas.width = rect.width;
+        sensorCanvas.height = rect.height;
+        if (sensorParticles.length === 0) {
+          initSensorReactorParticles();
+        }
+      }
+    }
+
+    /* ==========================================================
+       STREAMING_CHUNK:Tab 3 Forensic Inspector Simulator Logic & Canvas State...
+       ========================================================== */
+    const forensicState = {
+      selectedDoc: 'passport',
+      selectedSample: 'genuine',
+      filterMode: 'rcpl',
+      isFullLens: false,
+      audioEnabled: false,
+      lensPos: { x: 0.45, y: 0.30 },
+      isDraggingLens: false,
+      dragOffset: { x: 0, y: 0 },
+      waveAnimRunning: true,
+      time: 0
+    };
+
+    let synth = null;
+    function initAudio() {
+      if (!synth && window.Tone) {
+        synth = new Tone.PolySynth(Tone.Synth, {
+          oscillator: { type: 'sine' },
+          envelope: { attack: 0.02, decay: 0.1, sustain: 0.2, release: 0.4 }
+        }).toDestination();
+        synth.volume.value = -12;
+      }
+    }
+
+    function playInspectSound(type) {
+      if (!forensicState.audioEnabled) return;
+      try {
+        initAudio();
+        Tone.start();
+        if (type === 'genuine-rcpl') {
+          synth.triggerAttackRelease(["E5", "G#5", "B5"], "16n");
+        } else if (type === 'dark') {
+          synth.triggerAttackRelease(["C3"], "32n");
+        } else if (type === 'counterfeit') {
+          synth.triggerAttackRelease(["D4", "F4"], "16n");
+        }
+      } catch (e) {
+        console.warn(e);
+      }
+    }
+
+    function toggleAudio() {
+      forensicState.audioEnabled = !forensicState.audioEnabled;
+      const btn = document.getElementById('sound-toggle');
+      if (forensicState.audioEnabled) {
+        btn.textContent = 'AUDIO: ON';
+        btn.classList.add('text-emerald-700', 'border-emerald-400', 'bg-emerald-50');
+        initAudio();
+      } else {
+        btn.textContent = 'AUDIO: OFF';
+        btn.classList.remove('text-emerald-700', 'border-emerald-400', 'bg-emerald-50');
+      }
+    }
+
+    function selectDocument(docType) {
+      forensicState.selectedDoc = docType;
+      document.getElementById('doc-btn-passport').className = docType === 'passport' 
+        ? "px-3 py-1 text-xs rounded-lg font-bold transition bg-cyan-600 text-white shadow-sm" 
+        : "px-3 py-1 text-xs rounded-lg font-medium transition text-slate-600 hover:text-slate-900";
+      document.getElementById('doc-btn-banknote').className = docType === 'banknote' 
+        ? "px-3 py-1 text-xs rounded-lg font-bold transition bg-cyan-600 text-white shadow-sm" 
+        : "px-3 py-1 text-xs rounded-lg font-medium transition text-slate-600 hover:text-slate-900";
+      
+      updateTelemetry();
+      renderAll();
+    }
+
+    function selectSample(sampleType) {
+      forensicState.selectedSample = sampleType;
+      const gBtn = document.getElementById('sample-btn-genuine');
+      const cBtn = document.getElementById('sample-btn-counterfeit');
+      if (sampleType === 'genuine') {
+        gBtn.className = "px-3 py-1 text-xs rounded-lg font-semibold transition bg-emerald-100 text-emerald-800 border border-emerald-300";
+        cBtn.className = "px-3 py-1 text-xs rounded-lg font-medium transition text-slate-500 hover:text-slate-800";
+      } else {
+        cBtn.className = "px-3 py-1 text-xs rounded-lg font-semibold transition bg-rose-100 text-rose-800 border border-rose-300";
+        gBtn.className = "px-3 py-1 text-xs rounded-lg font-medium transition text-slate-500 hover:text-slate-800";
+      }
+      updateTelemetry();
+      renderAll();
+      playInspectSound(sampleType === 'genuine' ? 'genuine-rcpl' : 'counterfeit');
+    }
+
+    function setFilterMode(mode) {
+      forensicState.filterMode = mode;
+      const modes = ['naked', 'rcpl', 'lcpl'];
+      modes.forEach(m => {
+        const btn = document.getElementById(`filter-btn-${m}`);
+        if (m === mode) {
+          if (m === 'rcpl') {
+            btn.className = "px-2.5 py-1 text-xs rounded-lg font-bold transition bg-emerald-600 text-white shadow-sm";
+          } else if (m === 'lcpl') {
+            btn.className = "px-2.5 py-1 text-xs rounded-lg font-bold transition bg-rose-600 text-white shadow-sm";
+          } else {
+            btn.className = "px-2.5 py-1 text-xs rounded-lg font-bold transition bg-slate-700 text-white shadow-sm";
+          }
+        } else {
+          btn.className = "px-2.5 py-1 text-xs rounded-lg font-medium transition text-slate-600 hover:text-slate-900";
+        }
+      });
+
+      const scopeStatus = document.getElementById('scope-status');
+      const badgeText = document.getElementById('lens-badge-text');
+      if (mode === 'rcpl') {
+        scopeStatus.textContent = 'FILTER: 右円偏光 (R-CPL)';
+        scopeStatus.className = 'text-emerald-700 font-semibold bg-emerald-50 px-2 py-0.5 rounded border border-emerald-200';
+        badgeText.textContent = 'R-CPL 偏光受光器';
+      } else if (mode === 'lcpl') {
+        scopeStatus.textContent = 'FILTER: 左円偏光 (L-CPL)';
+        scopeStatus.className = 'text-rose-700 font-semibold bg-rose-50 px-2 py-0.5 rounded border border-rose-200';
+        badgeText.textContent = 'L-CPL 偏光受光器';
+      } else {
+        scopeStatus.textContent = 'FILTER: 自然光 (肉眼)';
+        scopeStatus.className = 'text-slate-700 font-semibold bg-slate-100 px-2 py-0.5 rounded border border-slate-300';
+        badgeText.textContent = '自然光 (無偏光)';
+      }
+
+      updateTelemetry();
+      renderAll();
+      if (forensicState.selectedSample === 'genuine' && mode === 'rcpl') {
+        playInspectSound('genuine-rcpl');
+      } else if (mode === 'lcpl') {
+        playInspectSound('dark');
+      }
+    }
+
+    function toggleFullLensMode() {
+      forensicState.isFullLens = !forensicState.isFullLens;
+      const lensEl = document.getElementById('lens');
+      const btnText = document.getElementById('full-lens-text');
+      if (forensicState.isFullLens) {
+        lensEl.style.display = 'none';
+        btnText.textContent = 'ルーペに戻す';
+      } else {
+        lensEl.style.display = 'block';
+        btnText.textContent = '全画面フィルター化';
+      }
+      renderAll();
+    }
+
+    function resetLensPosition() {
+      forensicState.lensPos = { x: 0.45, y: 0.30 };
+      updateLensDOMPosition();
+      renderAll();
+    }
+
+    function updateTelemetry() {
+      const isGenuine = forensicState.selectedSample === 'genuine';
+      const mode = forensicState.filterMode;
+
+      const badge = document.getElementById('telemetry-badge');
+      const title = document.getElementById('verdict-title');
+      const code = document.getElementById('verdict-code');
+      const desc = document.getElementById('verdict-desc');
+
+      const statEe = document.getElementById('stat-ee');
+      const barEe = document.getElementById('bar-ee');
+      const statGlum = document.getElementById('stat-glum');
+      const barGlum = document.getElementById('bar-glum');
+      const statCr = document.getElementById('stat-cr');
+      const barCr = document.getElementById('bar-cr');
+
+      const valRcpl = document.getElementById('val-rcpl-lum');
+      const valLcpl = document.getElementById('val-lcpl-lum');
+
+      if (isGenuine) {
+        badge.textContent = "GENUINE AUTHENTIC";
+        badge.className = "px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-emerald-50 text-emerald-700 border border-emerald-200";
+        title.textContent = "真正品 (合格)";
+        title.className = "text-2xl font-black text-emerald-600 tracking-tight";
+        code.textContent = "AUTH-PASS";
+
+        if (mode === 'rcpl') {
+          desc.textContent = "右円偏光検光子で鮮明なエメラルドグリーンの単一キラリティ発光を検出。不斉自己触媒による完全増幅を確認。";
+        } else if (mode === 'lcpl') {
+          desc.textContent = "左円偏光検光子で光シグナルが完全消光（遮断）。直交偏光消光比が基準値を満たし、真正性を証明。";
+        } else {
+          desc.textContent = "自然光観察中。ポリマー印字は通常の微細透かし・標準インクと同化し、肉眼では単一偏光特性を識別不能。";
+        }
+
+        statEe.textContent = "99.8% ee (R体)";
+        barEe.style.width = "99.8%";
+        barEe.className = "h-full bg-gradient-to-r from-emerald-500 to-cyan-500 rounded-full transition-all duration-300";
+
+        statGlum.textContent = "+0.84";
+        barGlum.style.width = "84%";
+        barGlum.className = "h-full bg-cyan-600 rounded-full transition-all duration-300";
+
+        statCr.textContent = "142 : 1";
+        barCr.style.width = "95%";
+
+        valRcpl.textContent = "94.2 %";
+        valLcpl.textContent = "0.7 %";
+      } else {
+        badge.textContent = "COUNTERFEIT ALERT";
+        badge.className = "px-2 py-0.5 rounded text-[11px] font-mono font-bold bg-rose-50 text-rose-700 border border-rose-200";
+        title.textContent = "偽造品 (異常検知)";
+        title.className = "text-2xl font-black text-rose-600 tracking-tight";
+        code.textContent = "REJECT-FAIL";
+
+        desc.textContent = "ラセミ体インクまたは通常染料による複製品。右円偏光と左円偏光での輝度差（二色性比）が検出されず、均一に散乱。";
+
+        statEe.textContent = "0.2% ee (ラセミ)";
+        barEe.style.width = "2%";
+        barEe.className = "h-full bg-rose-500 rounded-full transition-all duration-300";
+
+        statGlum.textContent = "0.01";
+        barGlum.style.width = "3%";
+        barGlum.className = "h-full bg-rose-500 rounded-full transition-all duration-300";
+
+        statCr.textContent = "1.05 : 1";
+        barCr.style.width = "5%";
+
+        valRcpl.textContent = "48.1 %";
+        valLcpl.textContent = "47.9 %";
+      }
+    }
+
+    const docCanvas = document.getElementById('docCanvas');
+    const docCtx = docCanvas.getContext('2d');
+    const lensCanvas = document.getElementById('lensCanvas');
+    const lensCtx = lensCanvas.getContext('2d');
+    const stageContainer = document.getElementById('stage-container');
+
+    function resizeCanvases() {
+      const rect = stageContainer.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return;
+
+      const dpr = window.devicePixelRatio || 1;
+      docCanvas.width = rect.width * dpr;
+      docCanvas.height = rect.height * dpr;
+      docCtx.resetTransform();
+      docCtx.scale(dpr, dpr);
+
+      const lensRect = document.getElementById('lens').getBoundingClientRect();
+      lensCanvas.width = lensRect.width * dpr;
+      lensCanvas.height = lensRect.height * dpr;
+      lensCtx.resetTransform();
+      lensCtx.scale(dpr, dpr);
+
+      updateLensDOMPosition();
+    }
+
+    function updateLensDOMPosition() {
+      const stageRect = stageContainer.getBoundingClientRect();
+      const lensEl = document.getElementById('lens');
+      const lensWidth = lensEl.offsetWidth;
+      const lensHeight = lensEl.offsetHeight;
+
+      const px = forensicState.lensPos.x * stageRect.width - (lensWidth / 2);
+      const py = forensicState.lensPos.y * stageRect.height - (lensHeight / 2);
+
+      lensEl.style.left = `${px}px`;
+      lensEl.style.top = `${py}px`;
+    }
+
+    function drawSecurityDocument(ctx, width, height, isLensView = false) {
+      ctx.save();
+
+      const isPassport = forensicState.selectedDoc === 'passport';
+      const isGenuine = forensicState.selectedSample === 'genuine';
+      const effectiveMode = isLensView ? forensicState.filterMode : (forensicState.isFullLens ? forensicState.filterMode : 'naked');
+
+      // 背景地紋 (ライトモード)
+      if (isPassport) {
+        const bgGrad = ctx.createLinearGradient(0, 0, width, height);
+        bgGrad.addColorStop(0, '#f8fafc');
+        bgGrad.addColorStop(0.5, '#f1f5f9');
+        bgGrad.addColorStop(1, '#e2e8f0');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, width, height);
+
+        ctx.strokeStyle = 'rgba(14, 165, 233, 0.18)';
+        ctx.lineWidth = 1;
+        for (let i = 0; i < width; i += 24) {
+          ctx.beginPath();
+          ctx.moveTo(i, 0);
+          ctx.bezierCurveTo(i + 40, height * 0.3, i - 40, height * 0.7, i, height);
+          ctx.stroke();
+        }
+        for (let j = 0; j < height; j += 20) {
+          ctx.beginPath();
+          ctx.moveTo(0, j);
+          ctx.bezierCurveTo(width * 0.4, j + 25, width * 0.6, j - 25, width, j);
+          ctx.stroke();
+        }
+
+        ctx.strokeStyle = 'rgba(148, 163, 184, 0.4)';
+        ctx.strokeRect(16, 16, width - 32, height - 32);
+
+        // 写真プレースホルダー
+        ctx.fillStyle = '#e2e8f0';
+        ctx.fillRect(36, 40, width * 0.26, height * 0.58);
+        ctx.strokeStyle = '#cbd5e1';
+        ctx.strokeRect(36, 40, width * 0.26, height * 0.58);
+
+        ctx.fillStyle = '#94a3b8';
+        const photoCenterX = 36 + (width * 0.13);
+        const photoCenterY = 40 + (height * 0.28);
+        ctx.beginPath();
+        ctx.arc(photoCenterX, photoCenterY - 15, width * 0.045, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.beginPath();
+        ctx.arc(photoCenterX, photoCenterY + 45, width * 0.08, Math.PI, 0, true);
+        ctx.fill();
+
+        ctx.fillStyle = '#1e293b';
+        ctx.font = 'bold 13px "Noto Sans JP", sans-serif';
+        ctx.fillText('JAPAN PASSPORT / 日本国旅券', width * 0.36, 52);
+        
+        ctx.font = '10px "JetBrains Mono", monospace';
+        ctx.fillStyle = '#475569';
+        ctx.fillText('Type / 旅券種類: P    Code: JPN    Passport No.: TR8294017', width * 0.36, 75);
+        ctx.fillText('Surname / 姓: CHIRAL', width * 0.36, 96);
+        ctx.fillText('Given name / 名: AUTOCATALYSIS', width * 0.36, 116);
+        ctx.fillText('Nationality / 国籍: JAPAN', width * 0.36, 136);
+        ctx.fillText('Date of birth: 07 OCT 2026', width * 0.36, 156);
+
+        ctx.font = '11px "JetBrains Mono", monospace';
+        ctx.fillStyle = '#334155';
+        ctx.fillText('P<JPNCHIRAL<<AUTOCATALYSIS<<<<<<<<<<<<<<<<<<', 36, height - 42);
+        ctx.fillText('TR82940174JPN2610073M3210072<<<<<<<<<<<<<<04', 36, height - 26);
+      } else {
+        const bgGrad = ctx.createLinearGradient(0, 0, width, height);
+        bgGrad.addColorStop(0, '#f0fdf4');
+        bgGrad.addColorStop(0.5, '#ecfdf5');
+        bgGrad.addColorStop(1, '#e2e8f0');
+        ctx.fillStyle = bgGrad;
+        ctx.fillRect(0, 0, width, height);
+
+        ctx.strokeStyle = 'rgba(16, 185, 129, 0.2)';
+        ctx.lineWidth = 1;
+        for (let r = 20; r < width * 0.45; r += 16) {
+          ctx.beginPath();
+          ctx.arc(width * 0.5, height * 0.5, r, 0, Math.PI * 2);
+          ctx.stroke();
+        }
+
+        ctx.strokeStyle = 'rgba(5, 150, 105, 0.4)';
+        ctx.strokeRect(14, 14, width - 28, height - 28);
+
+        ctx.font = 'bold 36px "JetBrains Mono", monospace';
+        ctx.fillStyle = 'rgba(15, 118, 110, 0.25)';
+        ctx.fillText('10000', 32, 54);
+        ctx.fillText('10000', width - 150, height - 32);
+
+        ctx.font = 'bold 15px "Noto Sans JP", sans-serif';
+        ctx.fillStyle = '#065f46';
+        ctx.fillText('CENTRAL BANK OF FUTURE / 究極不斉自己触媒券', width * 0.28, 48);
+
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+        ctx.strokeStyle = 'rgba(5, 150, 105, 0.3)';
+        ctx.beginPath();
+        if (ctx.roundRect) {
+          ctx.roundRect(width * 0.36, height * 0.25, width * 0.28, height * 0.5, 12);
+        } else {
+          ctx.rect(width * 0.36, height * 0.25, width * 0.28, height * 0.5);
+        }
+        ctx.fill();
+        ctx.stroke();
+      }
+
+      // 不斉自己触媒ポリマー印字部分
+      const cx = isPassport ? width * 0.82 : width * 0.78;
+      const cy = isPassport ? height * 0.38 : height * 0.45;
+      const emblemRadius = isPassport ? Math.min(width, height) * 0.16 : Math.min(width, height) * 0.19;
+      const stripeY = isPassport ? height * 0.68 : height * 0.52;
+
+      if (effectiveMode === 'naked') {
+        ctx.save();
+        ctx.strokeStyle = 'rgba(148, 163, 184, 0.6)';
+        ctx.lineWidth = 1.5;
+        
+        ctx.beginPath();
+        for (let i = 0; i < 16; i++) {
+          const angle = (i * Math.PI) / 8;
+          const rx = cx + Math.cos(angle) * emblemRadius;
+          const ry = cy + Math.sin(angle) * emblemRadius;
+          if (i === 0) ctx.moveTo(rx, ry);
+          else ctx.lineTo(rx, ry);
+        }
+        ctx.closePath();
+        ctx.stroke();
+
+        ctx.fillStyle = 'rgba(100, 116, 139, 0.7)';
+        ctx.font = '10px "JetBrains Mono"';
+        ctx.fillText('SEC-AUTOCATALYTIC-LAYER', cx - 65, cy + emblemRadius + 18);
+
+        ctx.fillStyle = 'rgba(100, 116, 139, 0.6)';
+        ctx.font = '8px "JetBrains Mono"';
+        ctx.fillText('MICROPRINT-POLARIZED-OPTICAL-LOCK-POLYMER-AUTHENTIC-VALIDATION', 40, stripeY);
+        ctx.restore();
+
+      } else if (effectiveMode === 'rcpl') {
+        if (isGenuine) {
+          ctx.save();
+          const grad = ctx.createRadialGradient(cx, cy, 2, cx, cy, emblemRadius * 1.3);
+          grad.addColorStop(0, 'rgba(2, 132, 199, 0.85)');
+          grad.addColorStop(0.5, 'rgba(5, 150, 105, 0.8)');
+          grad.addColorStop(1, 'rgba(5, 150, 105, 0)');
+          ctx.fillStyle = grad;
+          ctx.beginPath();
+          ctx.arc(cx, cy, emblemRadius * 1.3, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.strokeStyle = '#FFFFFF';
+          ctx.lineWidth = 2.5;
+          ctx.beginPath();
+          for (let i = 0; i <= 64; i++) {
+            const angle = (i * Math.PI * 6) / 64;
+            const r = (emblemRadius * i) / 64;
+            const px = cx + Math.cos(angle) * r;
+            const py = cy + Math.sin(angle) * r;
+            if (i === 0) ctx.moveTo(px, py);
+            else ctx.lineTo(px, py);
+          }
+          ctx.stroke();
+
+          for (let i = 0; i < 16; i++) {
+            const angle = (i * Math.PI * 2) / 16;
+            ctx.fillStyle = i % 2 === 0 ? 'rgba(2, 132, 199, 0.95)' : 'rgba(16, 185, 129, 0.95)';
+            ctx.beginPath();
+            ctx.ellipse(
+              cx + Math.cos(angle) * (emblemRadius * 0.7),
+              cy + Math.sin(angle) * (emblemRadius * 0.7),
+              emblemRadius * 0.28,
+              emblemRadius * 0.12,
+              angle,
+              0,
+              Math.PI * 2
+            );
+            ctx.fill();
+          }
+
+          ctx.font = 'bold 12px "JetBrains Mono"';
+          ctx.fillStyle = '#065F46';
+          ctx.fillText('★ CHIRAL R-CPL PASS ★', cx - 74, cy + emblemRadius + 22);
+
+          ctx.fillStyle = '#0284C7';
+          ctx.font = 'bold 10px "JetBrains Mono"';
+          ctx.fillText('>> GENUINE AUTOCATALYTIC CHIRAL POLYMER DETECTED [ee: 99.8%] <<', 36, stripeY);
+          ctx.restore();
+        } else {
+          ctx.save();
+          ctx.strokeStyle = 'rgba(225, 29, 72, 0.5)';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.arc(cx, cy, emblemRadius * 0.9, 0, Math.PI * 2);
+          ctx.stroke();
+
+          ctx.fillStyle = 'rgba(225, 29, 72, 0.7)';
+          ctx.font = '10px "JetBrains Mono"';
+          ctx.fillText('NO CHIRAL POLARIZATION', cx - 68, cy + emblemRadius + 18);
+          ctx.fillText('RACEMIC INK (50% DULL BLUR)', 36, stripeY);
+          ctx.restore();
+        }
+      } else if (effectiveMode === 'lcpl') {
+        if (isGenuine) {
+          ctx.save();
+          ctx.fillStyle = 'rgba(226, 232, 240, 0.95)';
+          ctx.beginPath();
+          ctx.arc(cx, cy, emblemRadius * 1.1, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.strokeStyle = 'rgba(148, 163, 184, 0.6)';
+          ctx.setLineDash([4, 4]);
+          ctx.stroke();
+
+          ctx.fillStyle = '#64748b';
+          ctx.font = '9px "JetBrains Mono"';
+          ctx.fillText('EXTINCTION (消光確認)', cx - 52, cy + 4);
+          ctx.fillText('[CPL REJECTED: L-ROTATION]', cx - 68, cy + emblemRadius + 18);
+          ctx.restore();
+        } else {
+          ctx.save();
+          ctx.strokeStyle = 'rgba(225, 29, 72, 0.5)';
+          ctx.lineWidth = 1;
+          ctx.beginPath();
+          ctx.arc(cx, cy, emblemRadius * 0.9, 0, Math.PI * 2);
+          ctx.stroke();
+
+          ctx.fillStyle = 'rgba(225, 29, 72, 0.7)';
+          ctx.font = '10px "JetBrains Mono"';
+          ctx.fillText('NO EXTINCTION (RACEMIC)', cx - 68, cy + emblemRadius + 18);
+          ctx.fillText('RACEMIC INK (NO STEREO DIFFERENCE)', 36, stripeY);
+          ctx.restore();
+        }
+      }
+
+      ctx.restore();
+    }
+
+    function renderAll() {
+      const inspectView = document.getElementById('forensic-view-inspect');
+      if (inspectView.classList.contains('hidden')) return;
+
+      const stageRect = stageContainer.getBoundingClientRect();
+      const w = stageRect.width;
+      const h = stageRect.height;
+      if (w === 0 || h === 0) return;
+
+      docCtx.clearRect(0, 0, w, h);
+      drawSecurityDocument(docCtx, w, h, false);
+
+      if (!forensicState.isFullLens) {
+        const lensEl = document.getElementById('lens');
+        const lw = lensEl.offsetWidth;
+        const lh = lensEl.offsetHeight;
+
+        lensCtx.clearRect(0, 0, lw, lh);
+        lensCtx.save();
+
+        const worldX = forensicState.lensPos.x * w;
+        const worldY = forensicState.lensPos.y * h;
+
+        lensCtx.beginPath();
+        lensCtx.arc(lw / 2, lh / 2, lw / 2 - 2, 0, Math.PI * 2);
+        lensCtx.clip();
+
+        lensCtx.translate(lw / 2 - worldX, lh / 2 - worldY);
+        drawSecurityDocument(lensCtx, w, h, true);
+
+        lensCtx.restore();
+        lensCtx.save();
+        const glassGrad = lensCtx.createLinearGradient(0, 0, lw, lh);
+        glassGrad.addColorStop(0, 'rgba(255, 255, 255, 0.4)');
+        glassGrad.addColorStop(0.5, 'rgba(255, 255, 255, 0.05)');
+        glassGrad.addColorStop(1, 'rgba(2, 132, 199, 0.15)');
+        lensCtx.fillStyle = glassGrad;
+        lensCtx.beginPath();
+        lensCtx.arc(lw / 2, lh / 2, lw / 2 - 2, 0, Math.PI * 2);
+        lensCtx.fill();
+        lensCtx.restore();
+      }
+
+      drawSpectrum();
+    }
+
+    const specCanvas = document.getElementById('spectrumCanvas');
+    const specCtx = specCanvas.getContext('2d');
+
+    function drawSpectrum() {
+      const dpr = window.devicePixelRatio || 1;
+      const rect = specCanvas.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return;
+
+      specCanvas.width = rect.width * dpr;
+      specCanvas.height = rect.height * dpr;
+      specCtx.resetTransform();
+      specCtx.scale(dpr, dpr);
+
+      const w = rect.width;
+      const h = rect.height;
+
+      specCtx.clearRect(0, 0, w, h);
+
+      specCtx.strokeStyle = 'rgba(203, 213, 225, 0.7)';
+      specCtx.lineWidth = 1;
+      for (let y = 10; y < h; y += 20) {
+        specCtx.beginPath();
+        specCtx.moveTo(0, y);
+        specCtx.lineTo(w, y);
+        specCtx.stroke();
+      }
+
+      const isGenuine = forensicState.selectedSample === 'genuine';
+      const mode = forensicState.filterMode;
+
+      specCtx.beginPath();
+      for (let x = 0; x < w; x++) {
+        const normX = x / w;
+        const lambda = 400 + normX * 300;
+        
+        const diff = lambda - 525;
+        const peak = Math.exp(-(diff * diff) / (2 * 28 * 28));
+
+        let intensity = 0;
+        if (isGenuine) {
+          if (mode === 'rcpl') intensity = peak * 0.88 + 0.05;
+          else if (mode === 'lcpl') intensity = 0.02;
+          else intensity = peak * 0.45 + 0.05;
+        } else {
+          intensity = peak * 0.42 + 0.08;
+        }
+
+        const y = h - (intensity * (h - 15)) - 5;
+        if (x === 0) specCtx.moveTo(x, y);
+        else specCtx.lineTo(x, y);
+      }
+
+      const grad = specCtx.createLinearGradient(0, 0, 0, h);
+      if (isGenuine && mode === 'rcpl') {
+        grad.addColorStop(0, 'rgba(5, 150, 105, 0.6)');
+        grad.addColorStop(1, 'rgba(5, 150, 105, 0)');
+        specCtx.strokeStyle = '#059669';
+      } else if (isGenuine && mode === 'lcpl') {
+        grad.addColorStop(0, 'rgba(148, 163, 184, 0.3)');
+        grad.addColorStop(1, 'rgba(148, 163, 184, 0)');
+        specCtx.strokeStyle = '#64748b';
+      } else if (!isGenuine) {
+        grad.addColorStop(0, 'rgba(225, 29, 72, 0.5)');
+        grad.addColorStop(1, 'rgba(225, 29, 72, 0)');
+        specCtx.strokeStyle = '#e11d48';
+      } else {
+        grad.addColorStop(0, 'rgba(2, 132, 199, 0.4)');
+        grad.addColorStop(1, 'rgba(2, 132, 199, 0)');
+        specCtx.strokeStyle = '#0284c7';
+      }
+
+      specCtx.lineWidth = 2;
+      specCtx.stroke();
+      specCtx.lineTo(w, h);
+      specCtx.lineTo(0, h);
+      specCtx.closePath();
+      specCtx.fillStyle = grad;
+      specCtx.fill();
+    }
+
+    const lensElement = document.getElementById('lens');
+
+    function onDragStart(e) {
+      if (forensicState.isFullLens) return;
+      forensicState.isDraggingLens = true;
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const lensRect = lensElement.getBoundingClientRect();
+      
+      forensicState.dragOffset.x = clientX - (lensRect.left + lensRect.width / 2);
+      forensicState.dragOffset.y = clientY - (lensRect.top + lensRect.height / 2);
+    }
+
+    function onDragMove(e) {
+      if (!forensicState.isDraggingLens || forensicState.isFullLens) return;
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const stageRect = stageContainer.getBoundingClientRect();
+
+      let nx = (clientX - stageRect.left - forensicState.dragOffset.x) / stageRect.width;
+      let ny = (clientY - stageRect.top - forensicState.dragOffset.y) / stageRect.height;
+
+      nx = Math.max(0.08, Math.min(0.92, nx));
+      ny = Math.max(0.08, Math.min(0.92, ny));
+
+      forensicState.lensPos.x = nx;
+      forensicState.lensPos.y = ny;
+
+      updateLensDOMPosition();
+      renderAll();
+    }
+
+    function onDragEnd() {
+      forensicState.isDraggingLens = false;
+    }
+
+    lensElement.addEventListener('mousedown', onDragStart);
+    window.addEventListener('mousemove', onDragMove);
+    window.addEventListener('mouseup', onDragEnd);
+
+    lensElement.addEventListener('touchstart', onDragStart, { passive: false });
+    window.addEventListener('touchmove', onDragMove, { passive: false });
+    window.addEventListener('touchend', onDragEnd);
+
+    stageContainer.addEventListener('click', (e) => {
+      if (e.target === lensElement || lensElement.contains(e.target)) return;
+      const stageRect = stageContainer.getBoundingClientRect();
+      const nx = (e.clientX - stageRect.left) / stageRect.width;
+      const ny = (e.clientY - stageRect.top) / stageRect.height;
+      forensicState.lensPos.x = Math.max(0.08, Math.min(0.92, nx));
+      forensicState.lensPos.y = Math.max(0.08, Math.min(0.92, ny));
+      updateLensDOMPosition();
+      renderAll();
+    });
+
+    const waveCanvas = document.getElementById('waveCanvas');
+    const waveCtx = waveCanvas.getContext('2d');
+
+    function toggleWaveAnimation() {
+      forensicState.waveAnimRunning = !forensicState.waveAnimRunning;
+      const btn = document.getElementById('toggle-wave-anim');
+      if (forensicState.waveAnimRunning) {
+        btn.textContent = '再生中 (ON)';
+        btn.className = 'px-3 py-1 text-xs rounded-lg bg-cyan-50 text-cyan-700 border border-cyan-200 font-mono font-medium shadow-sm';
+      } else {
+        btn.textContent = '一時停止 (OFF)';
+        btn.className = 'px-3 py-1 text-xs rounded-lg bg-slate-100 text-slate-500 border border-slate-300 font-mono';
+      }
+    }
+
+    function drawWaveSimulation() {
+      const waveView = document.getElementById('forensic-view-wave');
+      if (waveView.classList.contains('hidden')) return;
+
+      const dpr = window.devicePixelRatio || 1;
+      const rect = waveCanvas.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return;
+
+      waveCanvas.width = rect.width * dpr;
+      waveCanvas.height = rect.height * dpr;
+      waveCtx.resetTransform();
+      waveCtx.scale(dpr, dpr);
+
+      const w = rect.width;
+      const h = rect.height;
+      const midY = h * 0.52;
+
+      waveCtx.clearRect(0, 0, w, h);
+
+      waveCtx.strokeStyle = 'rgba(148, 163, 184, 0.6)';
+      waveCtx.setLineDash([4, 4]);
+      waveCtx.beginPath();
+      waveCtx.moveTo(20, midY);
+      waveCtx.lineTo(w - 20, midY);
+      waveCtx.stroke();
+      waveCtx.setLineDash([]);
+
+      const filterX = w * 0.62;
+      waveCtx.fillStyle = 'rgba(5, 150, 105, 0.1)';
+      waveCtx.strokeStyle = '#059669';
+      waveCtx.lineWidth = 1.5;
+      waveCtx.strokeRect(filterX - 6, midY - 65, 12, 130);
+      waveCtx.fillRect(filterX - 6, midY - 65, 12, 130);
+
+      waveCtx.fillStyle = '#065f46';
+      waveCtx.font = 'bold 10px "JetBrains Mono"';
+      waveCtx.fillText('右円偏光検光子 (R-CPL Filter)', filterX - 70, midY - 72);
+
+      const radius = 42;
+      const wavelength = 120;
+      const k = (Math.PI * 2) / wavelength;
+      const speed = 0.06;
+
+      // 1. 左側
+      waveCtx.strokeStyle = '#0284C7';
+      waveCtx.lineWidth = 2.5;
+      waveCtx.beginPath();
+
+      for (let x = 30; x <= filterX; x += 2) {
+        const phase = x * k - forensicState.time * speed;
+        const vy = Math.sin(phase) * radius;
+        const vz = Math.cos(phase) * (radius * 0.35);
+        const screenY = midY + vy + vz;
+
+        if (x === 30) waveCtx.moveTo(x, screenY);
+        else waveCtx.lineTo(x, screenY);
+      }
+      waveCtx.stroke();
+
+      for (let x = 40; x < filterX; x += 36) {
+        const phase = x * k - forensicState.time * speed;
+        const vy = Math.sin(phase) * radius;
+        const vz = Math.cos(phase) * (radius * 0.35);
+        waveCtx.strokeStyle = 'rgba(2, 132, 199, 0.25)';
+        waveCtx.lineWidth = 1;
+        waveCtx.beginPath();
+        waveCtx.moveTo(x, midY);
+        waveCtx.lineTo(x, midY + vy + vz);
+        waveCtx.stroke();
+      }
+
+      // 2. 右側
+      waveCtx.strokeStyle = '#059669';
+      waveCtx.lineWidth = 3;
+      waveCtx.beginPath();
+
+      for (let x = filterX; x <= w - 30; x += 2) {
+        const phase = x * k - forensicState.time * speed;
+        const vy = Math.sin(phase) * radius;
+        const vz = Math.cos(phase) * (radius * 0.35);
+        const screenY = midY + vy + vz;
+
+        if (x === filterX) waveCtx.moveTo(x, screenY);
+        else waveCtx.lineTo(x, screenY);
+      }
+      waveCtx.stroke();
+
+      waveCtx.fillStyle = '#0369a1';
+      waveCtx.font = 'bold 10px "JetBrains Mono"';
+      waveCtx.fillText('← 不斉自己触媒ポリマー放射 (純粋な右円偏光)', 40, midY + 70);
+      waveCtx.fillStyle = '#065f46';
+      waveCtx.fillText('検光子を全光量透過 (受光器で検出) →', filterX + 15, midY + 70);
+    }
+
+    function forensicLoop() {
+      if (forensicState.waveAnimRunning) {
+        forensicState.time += 1;
+      }
+      if (forensicCurrentSubTab === 'wave') {
+        drawWaveSimulation();
+      }
+      requestAnimationFrame(forensicLoop);
+    }
+
+    window.addEventListener('resize', () => {
+      resizeReactionCanvas();
+      resizeSensorCanvas();
+      resizePharmaCanvas();
+      resizeCanvases();
+      renderAll();
+    });
+
+    window.addEventListener('load', () => {
+      resizeReactionCanvas();
+      resizeSensorCanvas();
+      renderSensorReactor();
+      resizePharmaCanvas();
+      renderPharmaReactor();
+      resizeCanvases();
+      updateTelemetry();
+      renderAll();
+      forensicLoop();
+    });
+  </script>
+</body>
+</html>
